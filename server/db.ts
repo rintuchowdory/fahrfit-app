@@ -79,6 +79,24 @@ export async function listPublishedQuestions(topicId?: number) {
   }));
 }
 
+export async function listAdminQuestions(status?: "draft" | "published") {
+  const db = await getDb();
+  if (!db) return [];
+  const rows = await db.select().from(questions).where(status ? eq(questions.status, status) : undefined).orderBy(desc(questions.updatedAt));
+  if (!rows.length) return [];
+  const options = await db.select().from(answerOptions).where(inArray(answerOptions.questionId, rows.map(row => row.id))).orderBy(asc(answerOptions.sortOrder));
+  return rows.map(question => ({ ...question, options: options.filter(option => option.questionId === question.id) }));
+}
+
+export async function updateQuestionContent(input: { questionId: number; topicId: number; prompt: string; explanation: string; options: Array<{ label: string; text: string; isCorrect: boolean }>; mediaUrl?: string; storageKey?: string; mediaType?: "image" | "video"; thumbnailUrl?: string; duration?: number; mediaAlt?: string; rightsStatus: "owned" | "licensed" | "pending"; licenseSource?: string }) {
+  const db = await getDb();
+  if (!db) return false;
+  await db.update(questions).set({ topicId: input.topicId, prompt: input.prompt, explanation: input.explanation, mediaUrl: input.mediaUrl, storageKey: input.storageKey, mediaType: input.mediaType, thumbnailUrl: input.thumbnailUrl, duration: input.duration, mediaAlt: input.mediaAlt, rightsStatus: input.rightsStatus, licenseSource: input.licenseSource }).where(eq(questions.id, input.questionId));
+  await db.delete(answerOptions).where(eq(answerOptions.questionId, input.questionId));
+  await db.insert(answerOptions).values(input.options.map((option, index) => ({ questionId: input.questionId, label: option.label, text: option.text, isCorrect: option.isCorrect ? 1 : 0, sortOrder: index })));
+  return true;
+}
+
 export async function listErrorQuestionIds(userId: number) {
   const db = await getDb();
   if (!db) return [];

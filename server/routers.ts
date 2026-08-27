@@ -11,6 +11,8 @@ import {
   listPublishedQuestions,
   listRecentSessions,
   listTopics,
+  listAdminQuestions,
+  updateQuestionContent,
   recordAnswer,
   toggleFavorite,
   createTopic,
@@ -41,6 +43,7 @@ export const appRouter = router({
     toggleFavorite: protectedProcedure.input(z.object({ questionId: z.number() })).mutation(({ ctx, input }) => toggleFavorite(ctx.user.id, input.questionId)),
   }),
   admin: router({
+    drafts: adminProcedure.query(() => listAdminQuestions("draft")),
     createTopic: adminProcedure.input(z.object({ name: z.string().min(2), description: z.string().optional() })).mutation(({ input }) => createTopic(input.name, input.description)),
     uploadMedia: adminProcedure.input(z.object({ fileName: z.string().min(1).max(160), contentType: z.enum(["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm"]), base64: z.string().min(1) })).mutation(async ({ ctx, input }) => {
       const isVideo = input.contentType.startsWith("video/");
@@ -52,6 +55,7 @@ export const appRouter = router({
       return { key, url, mediaType: isVideo ? "video" as const : "image" as const };
     }),
     createQuestion: adminProcedure.input(z.object({ topicId: z.number(), prompt: z.string().min(5), explanation: z.string().min(5), mediaUrl: z.string().optional(), storageKey: z.string().optional(), mediaType: z.enum(["image", "video"]).optional(), thumbnailUrl: z.string().optional(), duration: z.number().int().min(0).optional(), mediaAlt: z.string().optional(), rightsStatus: z.enum(["owned", "licensed", "pending"]), licenseSource: z.string().max(255).optional(), difficulty: z.enum(["easy", "medium", "hard"]).optional(), options: z.array(z.object({ label: z.string(), text: z.string().min(1), isCorrect: z.boolean() })).min(2) })).mutation(({ input }) => createQuestion(input)),
+    updateQuestionContent: adminProcedure.input(z.object({ questionId: z.number(), topicId: z.number(), prompt: z.string().min(5), explanation: z.string().min(5), mediaUrl: z.string().optional(), storageKey: z.string().optional(), mediaType: z.enum(["image", "video"]).optional(), thumbnailUrl: z.string().optional(), duration: z.number().int().min(0).optional(), mediaAlt: z.string().optional(), rightsStatus: z.enum(["owned", "licensed", "pending"]), licenseSource: z.string().max(255).optional(), options: z.array(z.object({ label: z.string(), text: z.string().min(1), isCorrect: z.boolean() })).min(2) })).mutation(({ input }) => updateQuestionContent(input)),
     updateQuestionStatus: adminProcedure.input(z.object({ questionId: z.number(), status: z.enum(["draft", "published"]) })).mutation(({ input }) => updateQuestionStatus(input.questionId, input.status)),
   }),
 });

@@ -57,3 +57,12 @@
 - [x] Importer für einen vom Rechteinhaber gelieferten lizenzierten Klasse-B-Export erstellen
 - [x] Importvalidierung sowie Importformat und Lizenz-Metadaten testen; DB-Upsert bleibt für einen echten Lizenzexport ausstehend
 - [x] Kompressions- und Importdokumentation im README ergänzen
+
+- [x] Eigenständige Hintergrundfarbe und FahrFit-Hintergrundmotiv gestalten
+- [x] Admin-Tab „Entwürfe prüfen“ mit Vorschau, Bearbeiten und Veröffentlichen bauen
+- [x] Draft-Edit- und Publish-Procedures an die UI anbinden
+- [x] Custom Video Player mit eigenen Controls, Ladezustand und WebM-Fallback bauen
+- [x] Neue UI-Flows responsiv testen und als Checkpoint sichern
+
+- [ ] Aktuellen Stand nach Hintergrund-, Draft-Review- und Video-Player-Änderungen als neuen Webdev-Checkpoint speichern
+- [ ] Optional: Draft-Review-Flow manuell durchklicken und Admin-Tab prüfen
