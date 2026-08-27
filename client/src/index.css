@@ -104,3 +104,48 @@ button:focus-visible { outline: 3px solid rgba(97,88,217,.35); outline-offset: 3
 .result-stat:first-child strong { color:#fff; }
 .exam-rule-note { max-width:1200px; margin:0 auto 22px; color:#73778a; font-size:11px; line-height:1.5; }
 @media (max-width:520px) { .result-hero { padding:28px 20px; }.result-hero h2 { font-size:25px; }.result-actions { gap:14px; } }
+
+/* Image-led dashboard and immediate answer feedback */
+.visual-learning-strip { max-width:1200px; margin:0 auto 38px; display:grid; grid-template-columns:1.5fr .85fr; gap:16px; }
+.visual-card { min-height:226px; border-radius:20px; overflow:hidden; position:relative; border:1px solid rgba(20,33,61,.08); background:#fff; box-shadow:0 14px 36px rgba(28,38,75,.07); }
+.visual-card img { width:100%; height:100%; object-fit:cover; display:block; }
+.visual-card-main img { position:absolute; inset:0; opacity:.72; }
+.visual-card-main::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,#17233d 0%,rgba(23,35,61,.85) 42%,rgba(23,35,61,.16) 100%); }
+.visual-card-copy { position:relative; z-index:1; max-width:360px; padding:30px 32px; color:#fff; }
+.visual-card-copy h2 { font-family:'Manrope'; font-size:25px; letter-spacing:-.7px; margin:12px 0 8px; }
+.visual-card-copy p { color:#dbe1ef; font-size:13px; line-height:1.55; margin:0 0 21px; }
+.visual-card-copy button,.visual-card-side button,.readiness-panel button { display:inline-flex; align-items:center; gap:7px; border:0; cursor:pointer; font-weight:800; font-size:12px; }
+.visual-card-copy button { background:#fff; color:#14213d; padding:10px 13px; border-radius:10px; }
+.visual-card-side { display:grid; grid-template-rows:125px 1fr; }
+.visual-card-side img { height:125px; object-position:center 37%; }
+.visual-card-side > div { padding:18px 20px 17px; display:grid; grid-template-columns:1fr auto; align-items:end; gap:2px 12px; }
+.visual-card-side strong { font-family:'Manrope'; font-size:34px; color:#14213d; line-height:1; }
+.visual-card-side p { grid-column:1; margin:0; color:#8991a5; font-size:12px; }
+.visual-card-side button { grid-column:2; grid-row:1 / span 2; background:transparent; color:#6f5bec; padding:5px 0; align-self:end; }
+.answer-feedback { display:flex; align-items:center; gap:8px; margin-top:13px; padding:10px 12px; color:#16815f; background:#eaf8f1; border:1px solid #d2efe1; font-size:12px; font-weight:800; animation:answer-feedback-in .2s cubic-bezier(.23,1,.32,1); }
+.answer-feedback small { margin-left:auto; color:#679181; font-weight:600; }
+.answer-option.selected { transform:translateX(4px); }
+@media (prefers-reduced-motion: no-preference) { .answer-option { transition:transform .16s cubic-bezier(.23,1,.32,1),border-color .16s ease,background .16s ease; } .answer-option:active { transform:translateX(4px) scale(.985); } }
+@keyframes answer-feedback-in { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+.analytics-grid { max-width:1200px; margin:10px auto 34px; display:grid; grid-template-columns:1.65fr .85fr; gap:16px; }
+.analytics-panel { border:1px solid #e7e8f0; border-radius:20px; background:rgba(255,255,255,.9); padding:25px; box-shadow:0 13px 34px rgba(28,38,75,.045); }
+.analytics-heading { display:flex; justify-content:space-between; gap:18px; align-items:flex-start; }
+.analytics-heading h2 { margin:7px 0 4px; font-family:'Manrope'; font-size:21px; letter-spacing:-.5px; }
+.analytics-heading p { margin:0; color:#8991a5; font-size:12px; }
+.trend-chip { flex-shrink:0; padding:8px 10px; background:#f0efff; color:#6f5bec; font-size:11px; font-weight:800; }
+.penalty-chart { display:grid; grid-template-columns:30px 1fr; gap:10px; margin-top:22px; height:190px; }
+.chart-y-labels { display:flex; flex-direction:column; justify-content:space-between; color:#a1a6b4; font-size:10px; padding-bottom:25px; }
+.chart-area { position:relative; min-width:0; padding-bottom:25px; }
+.chart-area svg { position:absolute; inset:0 0 25px; width:100%; height:calc(100% - 25px); overflow:visible; }
+.chart-grid-line { position:absolute; left:0; right:0; border-top:1px dashed #e6e7ef; }
+.chart-grid-line.top { top:0; }.chart-grid-line.mid { top:50%; }.chart-grid-line.bottom { bottom:25px; }
+.chart-x-labels { position:absolute; left:0; right:0; bottom:0; display:flex; justify-content:space-between; color:#a1a6b4; font-size:10px; }
+.analytics-empty { min-height:190px; display:flex; align-items:center; gap:20px; color:#8991a5; font-size:12px; line-height:1.5; }
+.analytics-empty img { width:145px; height:110px; object-fit:cover; object-position:center; border-radius:12px; }
+.readiness-panel { display:flex; flex-direction:column; align-items:flex-start; background:linear-gradient(145deg,#14213d,#253b61); color:#fff; border-color:#14213d; }
+.readiness-orbit { width:112px; height:112px; border-radius:50%; display:grid; place-items:center; margin-bottom:20px; background:conic-gradient(#5ce0bb calc(var(--readiness, 0) * 1%),rgba(255,255,255,.13) 0); position:relative; }
+.readiness-orbit::after { content:""; position:absolute; inset:10px; border-radius:50%; background:#1b2c4b; }
+.readiness-orbit > div { position:relative; z-index:1; text-align:center; }.readiness-orbit strong { display:block; font-family:'Manrope'; font-size:25px; }.readiness-orbit span { color:#aebdd4; font-size:10px; }
+.readiness-panel .eyebrow { color:#93e6d0; }.readiness-panel h2 { margin:8px 0 7px; font-family:'Manrope'; font-size:21px; }.readiness-panel p { color:#b9c4d6; font-size:12px; line-height:1.55; margin:0 0 auto; }.readiness-panel button { margin-top:20px; padding:10px 12px; color:#14213d; background:#fff; border-radius:10px; }
+@media (max-width:900px) { .visual-learning-strip,.analytics-grid { grid-template-columns:1fr; }.visual-card-side { min-height:225px; }.readiness-panel { min-height:270px; } }
+@media (max-width:600px) { .visual-card-copy { padding:24px 21px; }.visual-card-main { min-height:250px; }.answer-feedback { align-items:flex-start; flex-wrap:wrap; }.answer-feedback small { width:100%; margin-left:24px; }.analytics-panel { padding:20px 17px; }.analytics-heading { display:block; }.trend-chip { display:inline-block; margin-top:14px; }.analytics-empty { min-height:150px; }.analytics-empty img { width:105px; height:85px; } }

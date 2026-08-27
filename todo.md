@@ -89,3 +89,8 @@
 - [x] Fehlertraining bei leerem Themenfilter strikt leer lassen statt auf allgemeine Fragen zurückzufallen
 - [x] Nach den Korrekturen einen neuen Webdev-Checkpoint sichern und final erneut validieren
 - [x] Gezielten Test für Ergebnisstatistiken ergänzen, der die doppelte Zählung der letzten richtigen Antwort verhindert
+
+- [x] Dashboard mit visuellen Fahr-/Lernillustrationen im Referenzstil erweitern
+- [x] Sofortfeedback und reduzierte Animationen beim Auswählen von Prüfungsantworten integrieren
+- [x] Verlauf der Fehlerpunkte und Prüfungsreife im Fortschritts-Dashboard visualisieren
+- [x] Neue Dashboard-, Prüfungs- und Fortschrittsflows testen und als Checkpoint sichern
