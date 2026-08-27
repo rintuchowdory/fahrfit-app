@@ -87,5 +87,5 @@
 - [x] Neue Prüfungs- und Fehlertraining-Flows testen und als Checkpoint sichern
 - [x] Letzte Prüfungsantwort nicht doppelt zählen und Ergebnisstatistiken end-to-end validieren
 - [x] Fehlertraining bei leerem Themenfilter strikt leer lassen statt auf allgemeine Fragen zurückzufallen
-- [ ] Nach den Korrekturen einen neuen Webdev-Checkpoint sichern und final erneut validieren
+- [x] Nach den Korrekturen einen neuen Webdev-Checkpoint sichern und final erneut validieren
 - [x] Gezielten Test für Ergebnisstatistiken ergänzen, der die doppelte Zählung der letzten richtigen Antwort verhindert
