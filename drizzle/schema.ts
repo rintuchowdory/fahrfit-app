@@ -35,6 +35,8 @@ export const questions = mysqlTable("questions", {
   licenseSource: varchar("licenseSource", { length: 255 }),
   sourceId: varchar("sourceId", { length: 128 }),
   difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).default("medium").notNull(),
+  /** Official theory-exam value: 2-5 penalty points when answered incorrectly. */
+  weight: int("weight").default(3).notNull(),
   status: mysqlEnum("status", ["draft", "published"]).default("published").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

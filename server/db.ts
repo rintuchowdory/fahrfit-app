@@ -123,7 +123,9 @@ export async function recordAnswer(userId: number, sessionId: number, questionId
   if (!db) return null;
   const session = await db.select().from(learningSessions).where(and(eq(learningSessions.id, sessionId), eq(learningSessions.userId, userId))).limit(1);
   if (!session[0]) return null;
-  await db.insert(userAnswers).values({ sessionId, questionId, selectedOptionIds: JSON.stringify(selectedOptionIds), isCorrect: isCorrect ? 1 : 0, mistakePoints });
+  const question = await db.select({ weight: questions.weight }).from(questions).where(eq(questions.id, questionId)).limit(1);
+  const effectiveMistakePoints = !isCorrect && session[0].mode === "exam" ? (question[0]?.weight ?? 3) : mistakePoints;
+  await db.insert(userAnswers).values({ sessionId, questionId, selectedOptionIds: JSON.stringify(selectedOptionIds), isCorrect: isCorrect ? 1 : 0, mistakePoints: effectiveMistakePoints });
   const current = await db.select().from(userQuestionStatus).where(and(eq(userQuestionStatus.userId, userId), eq(userQuestionStatus.questionId, questionId))).limit(1);
   const previous = current[0];
   const correctCount = (previous?.correctCount ?? 0) + (isCorrect ? 1 : 0);
@@ -137,7 +139,7 @@ export async function recordAnswer(userId: number, sessionId: number, questionId
   await db.update(learningSessions).set({
     completedQuestions: session[0].completedQuestions + 1,
     correctAnswers: session[0].correctAnswers + (isCorrect ? 1 : 0),
-    mistakePoints: session[0].mistakePoints + mistakePoints,
+    mistakePoints: session[0].mistakePoints + effectiveMistakePoints,
   }).where(eq(learningSessions.id, sessionId));
   return { isCorrect, mastery };
 }

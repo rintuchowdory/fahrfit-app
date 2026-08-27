@@ -78,4 +78,14 @@
 - [x] Themenfilter gegen leere Themen absichern und einen verständlichen Leerzustand anzeigen
 - [x] Aktuellen Stand nach Drag-and-drop, Themenfilter und Score-Zusammenfassung als neuen Webdev-Checkpoint speichern
 
-- [ ] Aktuellen Stand nach Drag-and-drop, Themenfilter, Leerzustand und Score-Zusammenfassung als neuen Webdev-Checkpoint speichern
+- [x] Aktuellen Stand nach Drag-and-drop, Themenfilter, Leerzustand und Score-Zusammenfassung als neuen Webdev-Checkpoint speichern
+
+- [x] Offizielle Klasse-B-Fehlerpunktelogik und Bestehensgrenze verifizieren
+- [x] Prüfungssimulation mit Fehlerpunkten und Ergebnisdetails implementieren
+- [x] Themenfilter auf den Fehlertrainingsmodus erweitern
+- [x] Hintergrundmotiv und Prüfungsergebnis-UX weiter verfeinern
+- [x] Neue Prüfungs- und Fehlertraining-Flows testen und als Checkpoint sichern
+- [x] Letzte Prüfungsantwort nicht doppelt zählen und Ergebnisstatistiken end-to-end validieren
+- [x] Fehlertraining bei leerem Themenfilter strikt leer lassen statt auf allgemeine Fragen zurückzufallen
+- [ ] Nach den Korrekturen einen neuen Webdev-Checkpoint sichern und final erneut validieren
+- [x] Gezielten Test für Ergebnisstatistiken ergänzen, der die doppelte Zählung der letzten richtigen Antwort verhindert

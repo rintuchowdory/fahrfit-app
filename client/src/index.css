@@ -93,3 +93,14 @@ button:focus-visible { outline: 3px solid rgba(97,88,217,.35); outline-offset: 3
 .topic-filter{display:flex;align-items:center;gap:7px;margin-left:auto}.topic-filter label{font-size:11px;color:#8991a5;font-weight:800;text-transform:uppercase;letter-spacing:.08em}.topic-filter select{border:1px solid #e4e5ee;background:#fff;color:#14213d;padding:7px 28px 7px 9px;font:inherit;font-size:12px}.topic-filter button{border:0;background:#14213d;color:#fff;padding:8px 11px;font-size:12px;font-weight:800;cursor:pointer}.player-progress-summary{display:grid;gap:8px;margin-bottom:24px}.score-summary{display:flex;gap:20px;color:#8991a5;font-size:12px}.score-summary strong{color:#14213d;font-size:14px}.upload-zone{cursor:pointer}.upload-zone.dragging{border-color:#6f5bec;background:#f0efff;box-shadow:0 0 0 4px rgba(111,91,236,.12);transform:translateY(-2px)}@media (max-width:760px){.learning-toolbar{align-items:flex-start;flex-wrap:wrap}.topic-filter{order:4;width:100%;margin-left:0}.topic-filter select{flex:1}.score-summary{justify-content:space-between;gap:8px;flex-wrap:wrap}}
 
 .empty-session-state{min-height:420px;display:grid;place-items:center;align-content:center;gap:12px;text-align:center;color:#6f5bec}.empty-session-state h2{margin:0;color:#14213d;font-size:28px}.empty-session-state p{max-width:420px;color:#8991a5;margin:0 0 12px}
+
+/* Official exam result treatment */
+.result-hero { position:relative; overflow:hidden; background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(241,240,255,.92) 58%,rgba(232,245,239,.86)); box-shadow:0 20px 55px rgba(42,48,92,.08); }
+.result-hero::after { content:""; position:absolute; width:220px; height:220px; right:-70px; top:-100px; border:1px solid rgba(111,91,236,.14); border-radius:50%; box-shadow:0 0 0 22px rgba(111,91,236,.045),0 0 0 44px rgba(111,91,236,.025); pointer-events:none; }
+.result-hero > * { position:relative; z-index:1; }
+.result-hero p { max-width:680px; margin-left:auto; margin-right:auto; line-height:1.65; }
+.result-stat:first-child { background:#14213d; border-color:#14213d; color:#fff; }
+.result-stat:first-child .eyebrow,.result-stat:first-child p { color:#c9d1e5; }
+.result-stat:first-child strong { color:#fff; }
+.exam-rule-note { max-width:1200px; margin:0 auto 22px; color:#73778a; font-size:11px; line-height:1.5; }
+@media (max-width:520px) { .result-hero { padding:28px 20px; }.result-hero h2 { font-size:25px; }.result-actions { gap:14px; } }

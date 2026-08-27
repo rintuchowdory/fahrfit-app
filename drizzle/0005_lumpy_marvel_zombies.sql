@@ -1,0 +1,1 @@
+ALTER TABLE `questions` ADD `weight` int DEFAULT 3 NOT NULL;

@@ -36,17 +36,18 @@ try {
   for (const question of payload.questions) {
     if (!question.sourceId || !question.prompt || !question.explanation || !question.topicSourceId) throw new Error("Jede Frage braucht sourceId, topicSourceId, prompt und explanation.");
     if (!Array.isArray(question.options) || question.options.length < 2 || !question.options.some(option => option.isCorrect)) throw new Error(`Ungültige Antwortoptionen für ${question.sourceId}.`);
+    if (!Number.isInteger(question.weight) || question.weight < 2 || question.weight > 5) throw new Error(`Ungültige Fehlerpunktzahl für ${question.sourceId}: erwartet 2-5.`);
     const topicId = topicIds.get(question.topicSourceId);
     if (!topicId) throw new Error(`Unbekanntes Thema ${question.topicSourceId} für ${question.sourceId}.`);
     const rightsStatus = "licensed";
     const [existing] = await connection.execute("SELECT id FROM questions WHERE sourceId = ? LIMIT 1", [question.sourceId]);
     let questionId = existing[0]?.id;
-    const values = [topicId, question.prompt, question.explanation, question.mediaUrl ?? null, question.storageKey ?? null, question.mediaType ?? null, question.thumbnailUrl ?? null, question.duration ?? null, question.mediaAlt ?? null, rightsStatus, payload.metadata.licenseSource, question.sourceId, question.difficulty ?? "medium"];
+    const values = [topicId, question.prompt, question.explanation, question.mediaUrl ?? null, question.storageKey ?? null, question.mediaType ?? null, question.thumbnailUrl ?? null, question.duration ?? null, question.mediaAlt ?? null, rightsStatus, payload.metadata.licenseSource, question.sourceId, question.difficulty ?? "medium", question.weight];
     if (questionId) {
-      await connection.execute("UPDATE questions SET topicId=?, prompt=?, explanation=?, mediaUrl=?, storageKey=?, mediaType=?, thumbnailUrl=?, duration=?, mediaAlt=?, rightsStatus=?, licenseSource=?, difficulty=? WHERE id=?", [...values.slice(0, 11), values[12], questionId]);
+      await connection.execute("UPDATE questions SET topicId=?, prompt=?, explanation=?, mediaUrl=?, storageKey=?, mediaType=?, thumbnailUrl=?, duration=?, mediaAlt=?, rightsStatus=?, licenseSource=?, difficulty=?, weight=? WHERE id=?", [...values.slice(0, 11), values[12], values[13], questionId]);
       await connection.execute("DELETE FROM answer_options WHERE questionId = ?", [questionId]);
     } else {
-      const [result] = await connection.execute("INSERT INTO questions (topicId,prompt,explanation,mediaUrl,storageKey,mediaType,thumbnailUrl,duration,mediaAlt,rightsStatus,licenseSource,sourceId,difficulty,status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [...values, "draft"]);
+      const [result] = await connection.execute("INSERT INTO questions (topicId,prompt,explanation,mediaUrl,storageKey,mediaType,thumbnailUrl,duration,mediaAlt,rightsStatus,licenseSource,sourceId,difficulty,weight,status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [...values, "draft"]);
       questionId = result.insertId;
     }
     for (const [index, option] of question.options.entries()) {
