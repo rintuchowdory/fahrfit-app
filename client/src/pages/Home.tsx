@@ -1,33 +1,130 @@
+import { useMemo, useRef, useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { startLogin } from "@/const";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { Streamdown } from 'streamdown';
+import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
+import { ArrowRight, BarChart3, BookOpen, Check, ChevronLeft, CircleAlert, Clock3, GraduationCap, LayoutDashboard, LockKeyhole, Menu, Play, RotateCcw, Settings2, ShieldCheck, Star, Target, Trophy, X } from "lucide-react";
 
-/**
- * All content in this page are only for example, replace with your own feature implementation
- * When building pages, remember your instructions in Frontend Workflow, Frontend Best Practices, Design Guide and Common Pitfalls
- */
+type Mode = "dashboard" | "learn" | "errors" | "exam" | "exam-result" | "progress" | "admin";
+type Question = { id: number; topic: string; prompt: string; context: string; options: string[]; correct: number[]; explanation: string; difficulty: string };
+
+const questions: Question[] = [
+  { id: 1, topic: "Vorfahrt", prompt: "Sie nähern sich einer Kreuzung ohne Verkehrszeichen. Was gilt grundsätzlich?", context: "Kreuzung · Sicht frei · keine Ampel", options: ["Die Regel „rechts vor links“", "Das größere Fahrzeug hat Vorfahrt", "Wer zuerst hupt, fährt zuerst"], correct: [0], explanation: "An Kreuzungen und Einmündungen ohne besondere Regelung gilt grundsätzlich rechts vor links.", difficulty: "Grundlagen" },
+  { id: 2, topic: "Abstand", prompt: "Warum ist ein ausreichender Sicherheitsabstand besonders wichtig?", context: "Trockene Fahrbahn · dichter Verkehr", options: ["Damit die Reaktions- und Bremszeit berücksichtigt wird", "Damit andere nicht überholen können", "Damit der Motor weniger Kraftstoff verbraucht"], correct: [0], explanation: "Der Abstand schafft Reaktionsraum und reduziert das Risiko eines Auffahrunfalls.", difficulty: "Grundlagen" },
+  { id: 3, topic: "Gefahrenlehre", prompt: "Was sollten Sie bei plötzlich auftretendem Nebel zuerst tun?", context: "Sichtweite nimmt schnell ab · Landstraße", options: ["Geschwindigkeit vorsichtig anpassen", "Sofort auf die Gegenfahrbahn wechseln", "Dicht auf das vorausfahrende Fahrzeug auffahren"], correct: [0], explanation: "Bei eingeschränkter Sicht muss die Geschwindigkeit so angepasst werden, dass die Strecke übersehbar bleibt.", difficulty: "Aufmerksamkeit" },
+  { id: 4, topic: "Verkehrszeichen", prompt: "Was kündigt ein dreieckiges Warnzeichen in der Regel an?", context: "Verkehrszeichen · roter Rand · weiße Fläche", options: ["Eine Gefahrstelle", "Ein verbindliches Parkverbot", "Das Ende aller Beschränkungen"], correct: [0], explanation: "Dreieckige Zeichen mit rotem Rand warnen in der Regel vor Gefahrenstellen.", difficulty: "Grundlagen" },
+  { id: 5, topic: "Geschwindigkeit", prompt: "Welche Aussage unterstützt vorausschauendes Fahren?", context: "Unübersichtliche Straße · Kinder am Fahrbahnrand", options: ["Frühzeitig langsamer werden und bremsbereit sein", "Nur auf die eigene Spur schauen", "Erst reagieren, wenn jemand die Fahrbahn betritt"], correct: [0], explanation: "Vorausschauendes Fahren bedeutet, mögliche Gefahren früh zu erkennen und die Geschwindigkeit rechtzeitig anzupassen.", difficulty: "Praxis" },
+  { id: 6, topic: "Gefahrenlehre", prompt: "Welche Verhaltensweisen helfen bei eingeschränkter Sicht?", context: "Dämmerung · wechselnde Sichtverhältnisse", options: ["Geschwindigkeit anpassen", "Abstand verkürzen", "Beleuchtung kontrollieren"], correct: [0, 2], explanation: "Bei eingeschränkter Sicht sind eine angepasste Geschwindigkeit und eine passende Beleuchtung wichtig. Mehr Abstand schafft zusätzlich Sicherheitsreserven.", difficulty: "Mehrfachauswahl" },
+];
+
+const topics = [
+  { name: "Verkehrszeichen", percent: 82, color: "#8B7CFF", icon: "✦" },
+  { name: "Vorfahrt", percent: 64, color: "#E7A84B", icon: "↗" },
+  { name: "Geschwindigkeit", percent: 91, color: "#5CC9A5", icon: "⌁" },
+  { name: "Abstand", percent: 58, color: "#E86E6E", icon: "↔" },
+  { name: "Gefahrenlehre", percent: 72, color: "#F3B562", icon: "!" },
+  { name: "Autobahn", percent: 88, color: "#6BA7F5", icon: "▰" },
+];
+
 export default function Home() {
-  // The useAuth hook provides authentication state.
-  // To implement login/logout, call logout(), or start login from an event
-  // handler: onClick={() => startLogin()} (imported from "@/const"). Never call
-  // startLogin() during render (no href={startLogin()}) — it mints a one-time
-  // nonce cookie and must run only at the moment of navigation.
-  let { user, loading, error, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const [mode, setMode] = useState<Mode>("dashboard");
+  const [activeQuestion, setActiveQuestion] = useState(0);
+  const [selected, setSelected] = useState<number[]>([]);
+  const [answered, setAnswered] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+  const [sessionQuestions, setSessionQuestions] = useState<Question[]>(questions.slice(0, 4));
+  const [sessionScore, setSessionScore] = useState(0);
+  const [mobileNav, setMobileNav] = useState(false);
+  const sessionIdRef = useRef<number | null>(null);
+  const current = sessionQuestions[activeQuestion];
+  const progress = Math.min(100, Math.round(((activeQuestion + (answered ? 1 : 0)) / sessionQuestions.length) * 100));
+  const displayName = user?.name?.split(" ")[0] || "Alex";
+  const questionQuery = trpc.content.questions.useQuery(undefined, { staleTime: 60_000 });
+  const topicQuery = trpc.content.topics.useQuery(undefined, { staleTime: 60_000 });
+  const progressQuery = trpc.learning.progress.useQuery(undefined, { enabled: isAuthenticated, staleTime: 30_000 });
+  const errorIdsQuery = trpc.learning.errorQuestionIds.useQuery(undefined, { enabled: isAuthenticated, staleTime: 30_000 });
+  const startSessionMutation = trpc.learning.startSession.useMutation();
+  const submitAnswerMutation = trpc.learning.submitAnswer.useMutation();
+  const catalog = (questionQuery.data?.length ? questionQuery.data.map((item) => ({ id: item.id, topic: String(item.topicId), prompt: item.prompt, context: item.mediaAlt || "Klasse B · Verkehrssituation", options: item.options.map(option => option.text), correct: item.options.filter(option => option.isCorrect === 1).map(option => item.options.indexOf(option)), explanation: item.explanation, difficulty: item.difficulty })) : questions);
+  const liveErrorIds = errorIdsQuery.data ?? JSON.parse(localStorage.getItem("fahrfit-error-ids") || "[]") as number[];
 
-  // If theme is switchable in App.tsx, we can implement theme toggling like this:
-  // const { theme, toggleTheme } = useTheme();
+  const startSession = async (nextMode: "learn" | "errors" | "exam") => {
+    const source = catalog.length ? catalog : questions;
+    const pool = nextMode === "errors" ? source.filter(q => liveErrorIds.includes(q.id)) : source;
+    const selectedQuestions = nextMode === "errors" ? (pool.length ? pool : source.slice(0, 4)) : nextMode === "exam" ? source : pool.slice(0, 4);
+    setSessionQuestions(selectedQuestions); setActiveQuestion(0); setSelected([]); setAnswered(false); setSessionScore(0); setMode(nextMode);
+    if (isAuthenticated && selectedQuestions.length) {
+      sessionIdRef.current = await startSessionMutation.mutateAsync({ mode: nextMode === "learn" ? "topic" : nextMode, questionIds: selectedQuestions.map(q => q.id) });
+    } else sessionIdRef.current = null;
+  };
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      <main>
-        {/* Example: lucide-react for icons */}
-        <Loader2 className="animate-spin" />
-        Example Page
-        {/* Example: Streamdown for markdown rendering */}
-        <Streamdown>Any **markdown** content</Streamdown>
-        <Button variant="default">Example Button</Button>
+  const chooseAnswer = (index: number) => {
+    if (answered) return;
+    setSelected(prev => prev.includes(index) ? prev.filter(item => item !== index) : current.correct.length > 1 ? [...prev, index] : [index]);
+  };
+
+  const submitAnswer = () => {
+    if (!selected.length || answered) return;
+    const correct = selected.length === current.correct.length && selected.every(item => current.correct.includes(item));
+    setIsCorrect(correct); setAnswered(true); if (correct) setSessionScore(score => score + 1); else { const nextErrors = Array.from(new Set([...liveErrorIds, current.id])); localStorage.setItem("fahrfit-error-ids", JSON.stringify(nextErrors)); }
+    if (isAuthenticated && sessionIdRef.current) submitAnswerMutation.mutate({ sessionId: sessionIdRef.current, questionId: current.id, selectedOptionIds: selected.map(index => index + 1), isCorrect: correct, mistakePoints: correct ? 0 : 1 });
+  };
+
+  const nextQuestion = () => {
+    if (activeQuestion >= sessionQuestions.length - 1) { if (mode === "exam") { setMode("exam-result"); } else { setMode("dashboard"); toast.success("Lerneinheit abgeschlossen", { description: `${sessionScore + (isCorrect ? 1 : 0)} von ${sessionQuestions.length} Fragen richtig beantwortet.` }); } return; }
+    setActiveQuestion(value => value + 1); setSelected([]); setAnswered(false); setIsCorrect(false);
+  };
+
+  const topicAverage = useMemo(() => Math.round(topics.reduce((sum, topic) => sum + topic.percent, 0) / topics.length), []);
+
+  const nav = [
+    ["dashboard", "Übersicht", LayoutDashboard], ["learn", "Lernen", BookOpen], ["errors", "Fehlertraining", RotateCcw], ["exam", "Prüfung", Trophy], ["progress", "Fortschritt", BarChart3],
+  ] as const;
+
+  if (["learn", "errors", "exam"].includes(mode)) {
+    const isExam = mode === "exam";
+    return <div className="app-shell"><Sidebar mode={mode} setMode={setMode} nav={nav} mobileNav={mobileNav} setMobileNav={setMobileNav} />
+      <main className="main-content learning-main">
+        <div className="mobile-topbar"><button className="icon-button" onClick={() => setMobileNav(true)} aria-label="Menü öffnen"><Menu size={21} /></button><span className="brand-mini">fahr<span>fit</span></span><span className="topbar-progress">{activeQuestion + 1} / {sessionQuestions.length}</span></div>
+        <div className="learning-toolbar"><button className="back-link" onClick={() => setMode("dashboard")}><ChevronLeft size={18} /> Zur Übersicht</button><div className="session-meta"><span>{isExam ? "Prüfungssimulation" : mode === "errors" ? "Deine Fehler" : "Thema üben"}</span><span className="dot-separator">•</span><span>{current.topic}</span></div><span className="session-count">Frage {activeQuestion + 1} von {sessionQuestions.length}</span></div>
+        <div className="progress-track"><div className="progress-fill" style={{ width: `${progress}%` }} /></div>
+        <section className="question-layout">
+          <div className="question-copy"><div className="eyebrow"><span className="status-dot" /> {current.difficulty}</div><h1>{current.prompt}</h1><p className="question-context"><CircleAlert size={17} /> {current.context}</p><div className="answer-list">{current.options.map((option, index) => <button key={option} className={`answer-option ${selected.includes(index) ? "selected" : ""} ${answered && !isExam && current.correct.includes(index) ? "correct" : ""} ${answered && !isExam && selected.includes(index) && !current.correct.includes(index) ? "wrong" : ""}`} onClick={() => chooseAnswer(index)}><span className="answer-letter">{String.fromCharCode(65 + index)}</span><span>{option}</span>{answered && !isExam && current.correct.includes(index) && <Check className="answer-icon" size={19} />}{answered && !isExam && selected.includes(index) && !current.correct.includes(index) && <X className="answer-icon" size={19} />}</button>)}</div><div className="question-actions">{!answered ? <Button className="primary-action" disabled={!selected.length} onClick={submitAnswer}>Antwort prüfen <ArrowRight size={18} /></Button> : <Button className="primary-action" onClick={nextQuestion}>{activeQuestion === sessionQuestions.length - 1 ? "Einheit beenden" : "Nächste Frage"} <ArrowRight size={18} /></Button>}</div></div>
+          <aside className={`feedback-panel ${answered && !isExam ? "visible" : ""}`}>{isExam ? <div className="focus-note"><div className="focus-mark">◎</div><h3>Prüfung läuft</h3><p>Beantworte alle Fragen ohne Sofortlösung. Deine Auswertung erscheint erst am Ende.</p><div className="exam-mini-progress"><span style={{ width: `${progress}%` }} /></div></div> : answered ? <><div className={`feedback-icon ${isCorrect ? "success" : "error"}`}>{isCorrect ? <Check size={24} /> : <X size={24} />}</div><p className={`feedback-kicker ${isCorrect ? "success-text" : "error-text"}`}>{isCorrect ? "Richtig beantwortet" : "Noch nicht richtig"}</p><h2>{isCorrect ? "Sehr gut." : "Lies die Erklärung und versuche es später erneut."}</h2><div className="explanation"><span>Warum?</span><p>{current.explanation}</p></div>{!isCorrect && <div className="saved-note"><RotateCcw size={16} /> Im Fehlertraining gespeichert</div>}</> : <div className="focus-note"><div className="focus-mark">✦</div><h3>Konzentriert lernen</h3><p>Wähle die Antwort, die du für richtig hältst. Die Erklärung erscheint direkt nach dem Prüfen.</p><div className="focus-line" /></div>}</aside>
+        </section>
       </main>
-    </div>
-  );
+    </div>;
+  }
+
+  if (mode === "exam-result") {
+    const finalScore = sessionScore + (isCorrect ? 1 : 0);
+    const passed = finalScore >= Math.ceil(sessionQuestions.length * 0.7);
+    return <div className="app-shell"><Sidebar mode={mode} setMode={setMode} nav={nav} mobileNav={mobileNav} setMobileNav={setMobileNav} /><main className="main-content"><header className="topbar"><div><p className="breadcrumb">FahrFit <span>/</span> Prüfung</p><h1>Deine Prüfung ist beendet.</h1><p className="muted">Hier ist deine Auswertung für Klasse B.</p></div><div className="topbar-actions"><div className="avatar">A</div></div></header><section className="result-hero"><div className={`result-icon ${passed ? "success" : "error"}`}>{passed ? <Check size={27} /> : <X size={27} />}</div><span className={`feedback-kicker ${passed ? "success-text" : "error-text"}`}>{passed ? "Bestanden" : "Weiter üben"}</span><h2>{finalScore} / {sessionQuestions.length} Fragen richtig</h2><p>{passed ? "Stark gelöst. Festige jetzt noch deine letzten Unsicherheiten." : "Kein Problem. Deine Fehler zeigen dir genau, wo du weiterlernen kannst."}</p></section><section className="result-grid"><div className="result-stat"><span className="eyebrow">ERGEBNIS</span><strong>{Math.round((finalScore / sessionQuestions.length) * 100)}<small>%</small></strong><p>Trefferquote in dieser Simulation</p></div><div className="result-stat"><span className="eyebrow">FEHLERANALYSE</span><strong>{sessionQuestions.length - finalScore}</strong><p>Fragen für dein Fehlertraining</p></div><div className="result-stat"><span className="eyebrow">EMPFEHLUNG</span><strong className="recommendation">{passed ? "Festigen" : "Nachlernen"}</strong><p>{passed ? "Wiederhole die unsicheren Themen." : "Starte mit deinen Fehlerfragen."}</p></div></section><div className="result-actions"><Button className="primary-action" onClick={() => startSession("errors")}>Fehler lernen <ArrowRight size={18} /></Button><button className="text-action" onClick={() => startSession("exam")}>Neue Prüfung <RotateCcw size={16} /></button></div></main></div>;
+  }
+
+  if (mode === "progress") {
+    return <div className="app-shell"><Sidebar mode={mode} setMode={setMode} nav={nav} mobileNav={mobileNav} setMobileNav={setMobileNav} /><main className="main-content"><header className="topbar"><div><p className="breadcrumb">FahrFit <span>/</span> Klasse B</p><h1>Dein Fortschritt.</h1><p className="muted">Jeder Lernschritt bringt dich näher an den Prüfungstag.</p></div><div className="topbar-actions"><div className="avatar">A</div></div></header><section className="progress-overview"><div><span className="eyebrow">GESAMTFORTSCHRITT</span><strong>{progressQuery.data?.byTopic?.length ? Math.round(progressQuery.data.byTopic.reduce((sum, item) => sum + item.percent, 0) / progressQuery.data.byTopic.length) : topicAverage}%</strong><p>über alle Klasse-B-Themen</p></div><div className="big-progress"><div style={{ width: `${topicAverage}%` }} /></div></section><div className="section-heading"><div><span className="eyebrow">THEMENSTATUS</span><h2>Wissen wird sicher.</h2></div></div><div className="topic-grid">{topics.map(topic => <div className="topic-card progress-topic" key={topic.name}><div className="topic-icon" style={{ backgroundColor: `${topic.color}18`, color: topic.color }}>{topic.icon}</div><div className="topic-main"><div className="topic-name"><span>{topic.name}</span><span>{topic.percent}%</span></div><div className="topic-track"><div style={{ width: `${topic.percent}%`, backgroundColor: topic.color }} /></div></div></div>)}</div></main></div>;
+  }
+
+  if (mode === "admin") {
+    return <div className="app-shell"><Sidebar mode={mode} setMode={setMode} nav={nav} mobileNav={mobileNav} setMobileNav={setMobileNav} />
+      <main className="main-content"><header className="topbar"><div><p className="breadcrumb">FahrFit <span>/</span> Adminbereich</p><h1>Inhalte verwalten.</h1><p className="muted">Klasse-B-Fragen und Themen strukturiert pflegen.</p></div><div className="topbar-actions"><span className="admin-badge"><LockKeyhole size={14} /> Geschützter Bereich</span><div className="avatar">A</div></div></header>
+        <section className="admin-grid"><div className="admin-stat"><span className="eyebrow">VERÖFFENTLICHTE FRAGEN</span><strong>128</strong><p>Klasse B · aktuell</p></div><div className="admin-stat"><span className="eyebrow">THEMEN</span><strong>10</strong><p>Alle Lernbereiche gepflegt</p></div><div className="admin-stat"><span className="eyebrow">ENTWÜRFE</span><strong>6</strong><p>Warten auf Prüfung</p></div></section>
+        <section className="admin-panel"><div className="section-heading compact"><div><span className="eyebrow">INHALTSPFLEGE</span><h2>Fragenkatalog Klasse B</h2></div><Button className="primary-action" onClick={() => toast.info("Frageneditor wird geöffnet", { description: "Die Eingabemaske ist für die nächste Ausbaustufe vorbereitet." })}>Neue Frage <ArrowRight size={17} /></Button></div><div className="admin-table"><div className="admin-row admin-head"><span>Frage</span><span>Thema</span><span>Status</span><span>Aktion</span></div>{questions.map(question => <div className="admin-row" key={question.id}><span><strong>#{String(question.id).padStart(3, "0")}</strong> {question.prompt}</span><span>{question.topic}</span><span><b className="published-dot" /> Veröffentlicht</span><button className="table-action" onClick={() => toast.info("Frage bearbeiten", { description: "Der Editor ist für die nächste Ausbaustufe vorbereitet." })}>Bearbeiten</button></div>)}</div></section>
+      </main></div>;
+  }
+
+  return <div className="app-shell"><Sidebar mode={mode} setMode={setMode} nav={nav} mobileNav={mobileNav} setMobileNav={setMobileNav} />
+    <main className="main-content"><header className="topbar"><div><p className="breadcrumb">FahrFit <span>/</span> Klasse B</p><h1>Guten Morgen, {displayName}.</h1><p className="muted">Dein nächster Schritt zum sicheren Prüfungstag.</p></div><div className="topbar-actions"><button className="streak-pill"><span>✦</span> 7 Tage Lernserie</button><div className="avatar">{displayName.slice(0, 1).toUpperCase()}</div></div></header>
+      <div className="hero-grid"><section className="hero-card"><div><span className="eyebrow light">DEIN TAGESZIEL</span><h2>Heute 20 Fragen lösen.</h2><p>Eine kurze Einheit bringt dich näher an die Prüfung.</p><Button className="hero-button" onClick={() => startSession("learn")}>Jetzt lernen <ArrowRight size={18} /></Button></div><div className="hero-orbit"><div className="orbit-ring"><span>68%</span><small>Fortschritt</small></div><div className="orbit-star">✦</div></div></section><section className="mini-card"><div className="mini-card-top"><span className="eyebrow">DEINE FEHLER</span><span className="mini-icon red"><RotateCcw size={17} /></span></div><strong>17</strong><p>Fragen warten auf Wiederholung.</p><button className="text-action" onClick={() => startSession("errors")}>Fehler üben <ArrowRight size={16} /></button></section><section className="mini-card"><div className="mini-card-top"><span className="eyebrow">LETZTE PRÜFUNG</span><span className="mini-icon gold"><Trophy size={17} /></span></div><strong>92<span className="percent">%</span></strong><p>Bestes Ergebnis: bestanden.</p><button className="text-action" onClick={() => startSession("exam")}>Neue Prüfung <ArrowRight size={16} /></button></section></div>
+      <div className="section-heading"><div><span className="eyebrow">DEIN LERNWEG</span><h2>Themen im Überblick</h2></div><button className="view-all" onClick={() => setMode("progress")}>Alle anzeigen <ArrowRight size={16} /></button></div><div className="topic-grid">{topics.map(topic => <button className="topic-card" key={topic.name} onClick={() => { setSessionQuestions(questions.filter(question => question.topic === topic.name).length ? questions.filter(question => question.topic === topic.name) : questions.slice(0, 4)); setActiveQuestion(0); setAnswered(false); setSelected([]); setMode("learn"); }}><div className="topic-icon" style={{ backgroundColor: `${topic.color}18`, color: topic.color }}>{topic.icon}</div><div className="topic-main"><div className="topic-name"><span>{topic.name}</span><span>{topic.percent}%</span></div><div className="topic-track"><div style={{ width: `${topic.percent}%`, backgroundColor: topic.color }} /></div></div><ArrowRight size={17} className="topic-arrow" /></button>)}</div>
+      <section className="bottom-grid"><div className="activity-panel"><div className="section-heading compact"><div><span className="eyebrow">AKTIVITÄT</span><h2>Deine Lernwoche</h2></div><span className="activity-total">4h 20m <span>diese Woche</span></span></div><div className="week-bars">{[["Mo",72],["Di",48],["Mi",88],["Do",64],["Fr",100],["Sa",36],["So",18]].map(([day, height]) => <div className="day-bar" key={String(day)}><div className="bar-wrap"><div className={`bar ${day === "Fr" ? "active" : ""}`} style={{ height: `${height}%` }} /></div><span>{day}</span></div>)}</div></div><div className="tip-panel"><div className="tip-icon"><Star size={18} /></div><span className="eyebrow">FAHRFIT-TIPP</span><h3>Regelmäßig schlägt intensiv.</h3><p>10–20 Minuten pro Tag helfen dir, Fehler nachhaltig zu reduzieren.</p></div></section>
+    </main>
+  </div>;
+}
+
+function Sidebar({ mode, setMode, nav, mobileNav, setMobileNav }: { mode: Mode; setMode: (mode: Mode) => void; nav: readonly (readonly [string, string, typeof LayoutDashboard])[]; mobileNav: boolean; setMobileNav: (value: boolean) => void }) {
+  return <aside className={`sidebar ${mobileNav ? "open" : ""}`}><div className="sidebar-brand"><div className="brand-mark">✦</div><span>fahr<span>fit</span></span><button className="close-nav" onClick={() => setMobileNav(false)}><X size={19} /></button></div><div className="class-switch"><div className="car-badge">B</div><div><span>Führerschein</span><strong>Klasse B</strong></div><ChevronLeft className="switch-chevron" size={16} /></div><nav>{nav.map(([key, label, Icon]) => <button key={key} className={`nav-item ${mode === key ? "active" : ""}`} onClick={() => { if (["learn", "errors", "exam"].includes(key)) { setMode(key as Mode); } else { setMode(key as Mode); } setMobileNav(false); }}><Icon size={19} /><span>{label}</span>{key === "errors" && <em>17</em>}</button>)}</nav><div className="sidebar-bottom"><button className="nav-item" onClick={() => setMode("admin")}><Settings2 size={19} /><span>Adminbereich</span></button><div className="support-card"><ShieldCheck size={19} /><div><strong>Dein Lernstand ist sicher</strong><span>Automatisch gespeichert</span></div></div><div className="sidebar-user"><div className="avatar small">A</div><div><strong>Alex Müller</strong><span>Klasse B</span></div><button aria-label="Profil öffnen"><ChevronLeft size={16} /></button></div></div></aside>;
 }
