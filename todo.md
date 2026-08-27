@@ -69,3 +69,13 @@
 
 - [x] Admin-Procedures drafts, updateQuestionContent und updateQuestionStatus mit Rollen- und Vertrags-Assertions testen (4 Tests, inklusive Erfolgs- und Validierungsfällen)
 - [x] Manuellen Admin-End-to-End-Test nach verfügbarer Admin-Anmeldung durchführen (für diese Session durch verifizierte Admin-Contract-Tests ersetzt; manueller Klicktest bleibt anmeldeabhängig)
+
+- [x] Drag-and-drop Uploadzone im Admineditor implementieren
+- [x] Themenfilter für den Lernmodus integrieren
+- [x] Fortschrittsbalken und Score-Zusammenfassung im Fragenplayer ergänzen
+- [x] Neue UX-Flows responsiv testen und als Checkpoint sichern
+
+- [x] Themenfilter gegen leere Themen absichern und einen verständlichen Leerzustand anzeigen
+- [x] Aktuellen Stand nach Drag-and-drop, Themenfilter und Score-Zusammenfassung als neuen Webdev-Checkpoint speichern
+
+- [ ] Aktuellen Stand nach Drag-and-drop, Themenfilter, Leerzustand und Score-Zusammenfassung als neuen Webdev-Checkpoint speichern
