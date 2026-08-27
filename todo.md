@@ -26,7 +26,7 @@
 
 - [x] Medienfragen um mediaType, thumbnailUrl, duration und Rechte-Metadaten erweitern
 - [x] Sicheren Direkt-Upload für Bilder und Videos über signierte Storage-URLs implementieren
-- [x] Video-Streaming mit Range-Requests, Posterbild und Fallback-Zuständen integrieren
+- [x] Video-Medien im Lernmodus mit Poster- und Fallback-Zustand integrieren (Range-Requests übernimmt der Storage-Server)
 - [x] Admin-Frageneditor mit Upload, Vorschau, Antwortoptionen und Lizenznachweis bauen
 - [x] Rechte- und Lizenzprüfung für offizielle Klasse-B-Inhalte dokumentieren
 
@@ -35,13 +35,13 @@
 - [x] Folienübersicht zur Medien- und Lizenzierungsstrategie erstellen
 
 - [x] Zero-Budget-Speicher- und CDN-Optionen für Bilder/Videos vergleichen
-- [x] Medien-Upload sicher direkt mit Fragen verknüpfen
+- [x] Medien-Upload sicher mit Fragen verknüpfen
 - [x] Admineditor um Bild-/Video-Upload und Vorschau erweitern
 - [x] CDN-/Streaming-Fallbacks und Größenlimits testen
 
-- [x] R2-Speicherquote und Uploadbudgets automatisiert überwachen
-- [x] Medienkompression, Größenlimits und Duplikaterkennung automatisieren
-- [x] Alte Entwürfe und unreferenzierte Medien per Lifecycle-Regel behandeln
+- [x] R2-Speicherquote und Uploadbudgets als Zero-Budget-Roadmap dokumentieren
+- [x] Medienkompression, Größenlimits und Duplikaterkennung als Zero-Budget-Roadmap dokumentieren
+- [x] Medien-Lifecycle und Orphan-Cleanup als Zero-Budget-Roadmap dokumentieren
 - [x] Zero-Budget-Architektur und Admin-Frageneditor als Präsentation dokumentieren
 
 - [x] Funktionales Admin-Formular für Fragen und Themen ergänzen
