@@ -26,23 +26,23 @@
 
 - [x] Medienfragen um mediaType, thumbnailUrl, duration und Rechte-Metadaten erweitern
 - [x] Sicheren Direkt-Upload für Bilder und Videos über signierte Storage-URLs implementieren
-- [ ] Video-Streaming mit Range-Requests, Posterbild und Fallback-Zuständen integrieren
+- [x] Video-Streaming mit Range-Requests, Posterbild und Fallback-Zuständen integrieren
 - [x] Admin-Frageneditor mit Upload, Vorschau, Antwortoptionen und Lizenznachweis bauen
-- [ ] Rechte- und Lizenzprüfung für offizielle Klasse-B-Inhalte dokumentieren
+- [x] Rechte- und Lizenzprüfung für offizielle Klasse-B-Inhalte dokumentieren
 
-- [ ] Offizielle arge-tp21-Gebührenlage und Lizenzumfang recherchieren
-- [ ] Bestätigte Kosten von Budgetannahmen trennen
-- [ ] Folienübersicht zur Medien- und Lizenzierungsstrategie erstellen
+- [x] Offizielle arge-tp21-Gebührenlage und Lizenzumfang recherchieren
+- [x] Bestätigte Kosten von Budgetannahmen trennen
+- [x] Folienübersicht zur Medien- und Lizenzierungsstrategie erstellen
 
-- [ ] Zero-Budget-Speicher- und CDN-Optionen für Bilder/Videos vergleichen
-- [ ] Medien-Upload sicher direkt mit Fragen verknüpfen
-- [ ] Admineditor um Bild-/Video-Upload und Vorschau erweitern
-- [ ] CDN-/Streaming-Fallbacks und Größenlimits testen
+- [x] Zero-Budget-Speicher- und CDN-Optionen für Bilder/Videos vergleichen
+- [x] Medien-Upload sicher direkt mit Fragen verknüpfen
+- [x] Admineditor um Bild-/Video-Upload und Vorschau erweitern
+- [x] CDN-/Streaming-Fallbacks und Größenlimits testen
 
-- [ ] R2-Speicherquote und Uploadbudgets automatisiert überwachen
-- [ ] Medienkompression, Größenlimits und Duplikaterkennung automatisieren
-- [ ] Alte Entwürfe und unreferenzierte Medien per Lifecycle-Regel behandeln
-- [ ] Zero-Budget-Architektur und Admin-Frageneditor als Präsentation dokumentieren
+- [x] R2-Speicherquote und Uploadbudgets automatisiert überwachen
+- [x] Medienkompression, Größenlimits und Duplikaterkennung automatisieren
+- [x] Alte Entwürfe und unreferenzierte Medien per Lifecycle-Regel behandeln
+- [x] Zero-Budget-Architektur und Admin-Frageneditor als Präsentation dokumentieren
 
 - [x] Funktionales Admin-Formular für Fragen und Themen ergänzen
 - [x] Bild- und Video-Upload mit Größen-/Formatprüfung und Vorschau integrieren
