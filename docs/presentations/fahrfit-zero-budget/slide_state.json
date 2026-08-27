@@ -1,0 +1,111 @@
+{
+  "project_info": {
+    "title": "FahrFit Zero-Budget-Architektur",
+    "created": 1787850032.227,
+    "last_updated": 1787850129.08,
+    "total_slides": 9
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "guardrails",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "upload_flow",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "lifecycle",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "monitoring",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "architecture",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "editor",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "recommendation",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "closing",
+      "state": "edited",
+      "pageNum": 9
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "FahrFit Zero-Budget-Architektur",
+      "summary": "Kostenbewusste Medienarchitektur für Klasse-B-Fragen, Bilder und Videos.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "guardrails",
+      "title": "Kostenlos heißt: harte Leitplanken",
+      "summary": "R2-Free-Tier-Grenzen und die Konsequenz für Uploads, Streaming und Monitoring.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "upload_flow",
+      "title": "Der Upload wird vor dem Speichern kontrolliert",
+      "summary": "Uploadfluss mit Größenlimits, Kompression, Formatprüfung und Duplikaterkennung.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "lifecycle",
+      "title": "Lifecycle-Regeln halten Speicher sauber",
+      "summary": "Temporäre Dateien, unreferenzierte Medien und alte Versionen werden automatisiert bereinigt.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "monitoring",
+      "title": "Quotenmonitoring verhindert Überraschungen",
+      "summary": "Speicher- und Operations-Tracker mit Warnstufen, Drosselung und Notfall-Stopp.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "architecture",
+      "title": "Storage, CDN und Frage bleiben getrennt",
+      "summary": "Medien liegen im Storage, Fragen speichern Metadaten, Lernende erhalten nur Playback-URLs.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "editor",
+      "title": "Der Admin-Frageneditor verbindet Inhalt und Medium",
+      "summary": "Editorstruktur für Frage, Antworten, Bild/Video, Rechte-Nachweis und Veröffentlichung.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "recommendation",
+      "title": "Empfehlung: klein starten, sauber skalieren",
+      "summary": "MVP mit eigenen komprimierten Medien und späterem Wechsel zu R2 oder anderen CDN-Angeboten.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "closing",
+      "title": "FahrFit bleibt kostenlos durch Disziplin",
+      "summary": "Kleine Medien, klare Limits, automatische Kontrolle.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}

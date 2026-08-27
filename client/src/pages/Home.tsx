@@ -7,7 +7,7 @@ import { trpc } from "@/lib/trpc";
 import { ArrowRight, BarChart3, BookOpen, Check, ChevronLeft, CircleAlert, Clock3, GraduationCap, LayoutDashboard, LockKeyhole, Menu, Play, RotateCcw, Settings2, ShieldCheck, Star, Target, Trophy, X } from "lucide-react";
 
 type Mode = "dashboard" | "learn" | "errors" | "exam" | "exam-result" | "progress" | "admin";
-type Question = { id: number; topic: string; prompt: string; context: string; options: string[]; correct: number[]; explanation: string; difficulty: string };
+type Question = { id: number; topic: string; prompt: string; context: string; options: string[]; correct: number[]; explanation: string; difficulty: string; mediaUrl?: string | null; mediaType?: "image" | "video" | null; mediaAlt?: string | null };
 
 const questions: Question[] = [
   { id: 1, topic: "Vorfahrt", prompt: "Sie nähern sich einer Kreuzung ohne Verkehrszeichen. Was gilt grundsätzlich?", context: "Kreuzung · Sicht frei · keine Ampel", options: ["Die Regel „rechts vor links“", "Das größere Fahrzeug hat Vorfahrt", "Wer zuerst hupt, fährt zuerst"], correct: [0], explanation: "An Kreuzungen und Einmündungen ohne besondere Regelung gilt grundsätzlich rechts vor links.", difficulty: "Grundlagen" },
@@ -47,6 +47,16 @@ export default function Home() {
   const errorIdsQuery = trpc.learning.errorQuestionIds.useQuery(undefined, { enabled: isAuthenticated, staleTime: 30_000 });
   const startSessionMutation = trpc.learning.startSession.useMutation();
   const submitAnswerMutation = trpc.learning.submitAnswer.useMutation();
+  const uploadMediaMutation = trpc.admin.uploadMedia.useMutation();
+  const createQuestionMutation = trpc.admin.createQuestion.useMutation();
+  const [adminPrompt, setAdminPrompt] = useState("");
+  const [adminExplanation, setAdminExplanation] = useState("");
+  const [adminTopicId, setAdminTopicId] = useState<number | undefined>(undefined);
+  const [adminMedia, setAdminMedia] = useState<{ key: string; url: string; type: "image" | "video"; alt: string } | null>(null);
+  const [adminRightsStatus, setAdminRightsStatus] = useState<"owned" | "licensed" | "pending">("owned");
+  const [adminLicenseSource, setAdminLicenseSource] = useState("");
+  const [adminOptions, setAdminOptions] = useState(["", ""]);
+  const [adminCorrectIndex, setAdminCorrectIndex] = useState(0);
   const catalog = (questionQuery.data?.length ? questionQuery.data.map((item) => ({ id: item.id, topic: String(item.topicId), prompt: item.prompt, context: item.mediaAlt || "Klasse B · Verkehrssituation", options: item.options.map(option => option.text), correct: item.options.filter(option => option.isCorrect === 1).map(option => item.options.indexOf(option)), explanation: item.explanation, difficulty: item.difficulty })) : questions);
   const liveErrorIds = errorIdsQuery.data ?? JSON.parse(localStorage.getItem("fahrfit-error-ids") || "[]") as number[];
 
@@ -79,6 +89,31 @@ export default function Home() {
 
   const topicAverage = useMemo(() => Math.round(topics.reduce((sum, topic) => sum + topic.percent, 0) / topics.length), []);
 
+  const handleAdminFile = (file?: File) => {
+    if (!file) return;
+    const allowed = ["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm"];
+    if (!allowed.includes(file.type)) { toast.error("Format nicht unterstützt", { description: "Nutze JPG, PNG, WebP, MP4 oder WebM." }); return; }
+    const max = file.type.startsWith("video/") ? 20 * 1024 * 1024 : 2 * 1024 * 1024;
+    if (file.size > max) { toast.error("Datei zu groß", { description: `Maximum: ${file.type.startsWith("video/") ? "20 MB" : "2 MB"}.` }); return; }
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const uploaded = await uploadMediaMutation.mutateAsync({ fileName: file.name, contentType: file.type as "image/jpeg" | "image/png" | "image/webp" | "video/mp4" | "video/webm", base64: String(reader.result) });
+        setAdminMedia({ key: uploaded.key, url: uploaded.url, type: uploaded.mediaType, alt: file.name.replace(/\.[^.]+$/, "") });
+        toast.success("Medium hochgeladen", { description: "Die Datei ist bereit zur Verknüpfung." });
+      } catch (error) { toast.error("Upload fehlgeschlagen", { description: error instanceof Error ? error.message : "Bitte erneut versuchen." }); }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const saveAdminQuestion = async () => {
+    if (!adminTopicId || adminPrompt.trim().length < 5 || adminExplanation.trim().length < 5 || adminOptions.length < 2 || adminOptions.some(option => !option.trim())) { toast.error("Pflichtfelder prüfen", { description: "Thema, Frage, Erklärung und mindestens zwei Antworten sind erforderlich." }); return; }
+    try {
+      await createQuestionMutation.mutateAsync({ topicId: adminTopicId, prompt: adminPrompt.trim(), explanation: adminExplanation.trim(), mediaUrl: adminMedia?.url, storageKey: adminMedia?.key, mediaType: adminMedia?.type, mediaAlt: adminMedia?.alt, rightsStatus: adminRightsStatus, licenseSource: adminLicenseSource.trim() || undefined, options: adminOptions.map((text, index) => ({ label: String.fromCharCode(65 + index), text: text.trim(), isCorrect: index === adminCorrectIndex })) });
+      toast.success("Frage als Entwurf gespeichert"); setAdminPrompt(""); setAdminExplanation(""); setAdminMedia(null); setAdminRightsStatus("owned"); setAdminLicenseSource(""); setAdminOptions(["", ""]); setAdminCorrectIndex(0);
+    } catch (error) { toast.error("Frage konnte nicht gespeichert werden", { description: error instanceof Error ? error.message : "Bitte erneut versuchen." }); }
+  };
+
   const nav = [
     ["dashboard", "Übersicht", LayoutDashboard], ["learn", "Lernen", BookOpen], ["errors", "Fehlertraining", RotateCcw], ["exam", "Prüfung", Trophy], ["progress", "Fortschritt", BarChart3],
   ] as const;
@@ -110,9 +145,9 @@ export default function Home() {
 
   if (mode === "admin") {
     return <div className="app-shell"><Sidebar mode={mode} setMode={setMode} nav={nav} mobileNav={mobileNav} setMobileNav={setMobileNav} />
-      <main className="main-content"><header className="topbar"><div><p className="breadcrumb">FahrFit <span>/</span> Adminbereich</p><h1>Inhalte verwalten.</h1><p className="muted">Klasse-B-Fragen und Themen strukturiert pflegen.</p></div><div className="topbar-actions"><span className="admin-badge"><LockKeyhole size={14} /> Geschützter Bereich</span><div className="avatar">A</div></div></header>
-        <section className="admin-grid"><div className="admin-stat"><span className="eyebrow">VERÖFFENTLICHTE FRAGEN</span><strong>128</strong><p>Klasse B · aktuell</p></div><div className="admin-stat"><span className="eyebrow">THEMEN</span><strong>10</strong><p>Alle Lernbereiche gepflegt</p></div><div className="admin-stat"><span className="eyebrow">ENTWÜRFE</span><strong>6</strong><p>Warten auf Prüfung</p></div></section>
-        <section className="admin-panel"><div className="section-heading compact"><div><span className="eyebrow">INHALTSPFLEGE</span><h2>Fragenkatalog Klasse B</h2></div><Button className="primary-action" onClick={() => toast.info("Frageneditor wird geöffnet", { description: "Die Eingabemaske ist für die nächste Ausbaustufe vorbereitet." })}>Neue Frage <ArrowRight size={17} /></Button></div><div className="admin-table"><div className="admin-row admin-head"><span>Frage</span><span>Thema</span><span>Status</span><span>Aktion</span></div>{questions.map(question => <div className="admin-row" key={question.id}><span><strong>#{String(question.id).padStart(3, "0")}</strong> {question.prompt}</span><span>{question.topic}</span><span><b className="published-dot" /> Veröffentlicht</span><button className="table-action" onClick={() => toast.info("Frage bearbeiten", { description: "Der Editor ist für die nächste Ausbaustufe vorbereitet." })}>Bearbeiten</button></div>)}</div></section>
+      <main className="main-content"><header className="topbar"><div><p className="breadcrumb">FahrFit <span>/</span> Adminbereich</p><h1>Inhalte verwalten.</h1><p className="muted">Klasse-B-Fragen, Medien und Rechte strukturiert pflegen.</p></div><div className="topbar-actions"><span className="admin-badge"><LockKeyhole size={14} /> Geschützter Bereich</span><div className="avatar">A</div></div></header>
+        <section className="admin-grid"><div className="admin-stat"><span className="eyebrow">VERÖFFENTLICHTE FRAGEN</span><strong>{questionQuery.data?.length ?? questions.length}</strong><p>Klasse B · aktuell</p></div><div className="admin-stat"><span className="eyebrow">THEMEN</span><strong>{topicQuery.data?.length ?? topics.length}</strong><p>Alle Lernbereiche gepflegt</p></div><div className="admin-stat"><span className="eyebrow">MEDIEN-UPLOAD</span><strong>{adminMedia ? "Bereit" : "Offen"}</strong><p>Bild bis 2 MB · Video bis 20 MB</p></div></section>
+        <section className="admin-editor"><div className="section-heading compact"><div><span className="eyebrow">NEUE FRAGE</span><h2>Frageneditor Klasse B</h2></div><span className="admin-badge"><ShieldCheck size={14} /> Entwurf bis zur Freigabe</span></div><div className="editor-grid"><div className="editor-fields"><label>Thema<select value={adminTopicId ?? ""} onChange={event => setAdminTopicId(Number(event.target.value) || undefined)}><option value="">Thema auswählen</option>{(topicQuery.data ?? []).map(topic => <option key={topic.id} value={topic.id}>{topic.name}</option>)}</select></label><label>Frage<textarea value={adminPrompt} onChange={event => setAdminPrompt(event.target.value)} placeholder="Beschreibe die Verkehrssituation …" /></label><label>Erklärung<textarea value={adminExplanation} onChange={event => setAdminExplanation(event.target.value)} placeholder="Warum ist diese Antwort richtig?" /></label><div className="options-editor"><div className="editor-label">Antwortoptionen <span>Erste markierte Option ist korrekt</span></div>{adminOptions.map((option, index) => <div className="option-row" key={index}><input aria-label={`Antwort ${index + 1}`} value={option} onChange={event => setAdminOptions(values => values.map((value, item) => item === index ? event.target.value : value))} placeholder={`Antwort ${String.fromCharCode(65 + index)}`} /><label className="correct-toggle"><input type="radio" name="correct-option" checked={adminCorrectIndex === index} onChange={() => setAdminCorrectIndex(index)} /> richtig</label>{adminOptions.length > 2 && <button type="button" className="table-action" onClick={() => setAdminOptions(values => values.filter((_, item) => item !== index))}>Entfernen</button>}</div>)}<button type="button" className="text-action" onClick={() => setAdminOptions(values => [...values, ""])}>+ Antwort hinzufügen</button></div></div><div className="editor-media"><label className="upload-zone"><input type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" onChange={event => handleAdminFile(event.target.files?.[0])} /><span className="upload-icon">{uploadMediaMutation.isPending ? "…" : "↑"}</span><strong>{adminMedia ? "Medium ersetzt" : "Bild oder Video hochladen"}</strong><small>JPG, PNG, WebP bis 2 MB · MP4/WebM bis 20 MB</small></label>{adminMedia && <div className="media-preview">{adminMedia.type === "video" ? <video src={adminMedia.url} controls preload="metadata" /> : <img src={adminMedia.url} alt={adminMedia.alt} />}<button type="button" className="table-action" onClick={() => setAdminMedia(null)}>Medium entfernen</button></div>}<label>Alternativtext<input value={adminMedia?.alt ?? ""} onChange={event => setAdminMedia(media => media ? { ...media, alt: event.target.value } : media)} placeholder="Beschreibung für Barrierefreiheit" /></label><label>Rechte-Status<select value={adminRightsStatus} onChange={event => setAdminRightsStatus(event.target.value as "owned" | "licensed" | "pending")}><option value="owned">Eigene Aufnahme</option><option value="licensed">Lizenziert</option><option value="pending">Noch nicht geprüft</option></select></label><label>Lizenzquelle / Nachweis<input value={adminLicenseSource} onChange={event => setAdminLicenseSource(event.target.value)} placeholder="z. B. Vertrag, Quelle oder Asset-ID" /></label><div className="rights-note"><LockKeyhole size={16} /><span>Nur eigene oder nachweislich lizenzierte Medien hochladen. Bei „Noch nicht geprüft“ bleibt die Frage ein Entwurf.</span></div><Button className="primary-action" disabled={createQuestionMutation.isPending || uploadMediaMutation.isPending} onClick={saveAdminQuestion}>{createQuestionMutation.isPending ? "Speichert …" : "Frage als Entwurf speichern"} <ArrowRight size={17} /></Button></div></div></section>
       </main></div>;
   }
 

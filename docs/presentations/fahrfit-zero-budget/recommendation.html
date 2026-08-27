@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      .slide-container { 
+        width: 1280px; 
+        min-height: 720px; 
+        background: #f7f6f2; 
+        color: #222; 
+        font-family: Arial, sans-serif; 
+        padding-top: 62px;
+        position: relative;
+      }
+      .header { padding-left: 78px; padding-right: 78px; }
+      .eyebrow { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #6d68d8; font-weight: 700; }
+      .title { font-size: 42px; letter-spacing: -1.5px; margin-top: 18px; margin-bottom: 12px; max-width: 900px; }
+      .sub { font-size: 18px; color: #706e78; max-width: 740px; line-height: 1.4; }
+      
+      .content-grid { 
+        display: grid; 
+        grid-template-columns: 42% 58%; 
+        gap: 60px; 
+        padding-left: 78px; 
+        padding-right: 78px; 
+        margin-top: 70px; 
+      }
+      
+      .recommendation-box { border-top: 4px solid #f2bd62; padding-top: 30px; }
+      .recommendation-text { font-size: 28px; font-weight: 700; color: #24205b; line-height: 1.3; margin-bottom: 25px; }
+      .recommendation-desc { font-size: 16px; color: #555; line-height: 1.6; }
+      
+      .timeline { display: flex; flex-direction: column; gap: 30px; }
+      .timeline-track { background: #fff; border: 1px solid #e2e0e8; padding-top: 30px; padding-left: 30px; padding-right: 30px; min-height: 180px; }
+      .track-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; color: #6d68d8; margin-bottom: 20px; display: block; }
+      
+      .track-steps { display: flex; justify-content: space-between; position: relative; }
+      .track-steps::before { content: ''; position: absolute; top: 15px; left: 0; right: 0; height: 2px; background: #d5d3e8; z-index: 1; }
+      
+      .step { position: relative; z-index: 2; text-align: center; width: 130px; }
+      .step-dot { width: 32px; height: 32px; background: #fff; border: 2px solid #6d68d8; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #6d68d8; font-weight: 700; }
+      .step.active .step-dot { background: #6d68d8; color: #fff; }
+      .step-label { font-size: 13px; font-weight: 600; color: #24205b; line-height: 1.2; }
+      
+      .footer { position: absolute; bottom: 44px; left: 78px; right: 78px; border-top: 1px solid #d9d7df; padding-top: 12px; font-size: 12px; color: #8d8994; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="eyebrow">08 · Strategie</div>
+            <h1 class="title">Empfehlung: klein starten, sauber skalieren</h1>
+            <p class="sub">Wir nutzen die vorhandene Infrastruktur für den MVP und bereiten den Wechsel auf spezialisierte CDN-Dienste architektonisch vor.</p>
+        </div>
+
+        <div class="content-grid">
+            <div class="recommendation-box">
+                <div class="recommendation-text">„Effizienz im Start, Flexibilität im Wachstum.“</div>
+                <p class="recommendation-desc">
+                    Durch strikte Kompression und Quotenüberwachung bleibt FahrFit im MVP vollständig kostenlos. Die Architektur erlaubt den Wechsel zu R2 ohne Code-Änderungen.
+                </p>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-track">
+                    <span class="track-label">Phase 1: MVP-Start (Sofort)</span>
+                    <div class="track-steps">
+                        <div class="step active">
+                            <div class="step-dot">1</div>
+                            <div class="step-label">Integrierter<br>Storage</div>
+                        </div>
+                        <div class="step active">
+                            <div class="step-dot">2</div>
+                            <div class="step-label">Strikte<br>Kompression</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-dot">3</div>
+                            <div class="step-label">Quoten-<br>Monitoring</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-track">
+                    <span class="track-label">Phase 2: Skalierung (Bei Bedarf)</span>
+                    <div class="track-steps">
+                        <div class="step active">
+                            <div class="step-dot"><i class="fas fa-cloud"></i></div>
+                            <div class="step-label">Cloudflare R2<br>Migration</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-dot"><i class="fas fa-bolt"></i></div>
+                            <div class="step-label">Globales<br>CDN-Caching</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-dot"><i class="fas fa-expand-arrows-alt"></i></div>
+                            <div class="step-label">Erweiterte<br>Kontingente</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span>FahrFit · Zero-Budget-Roadmap</span>
+            <span>08</span>
+        </div>
+    </div>
+</body>
+</html>

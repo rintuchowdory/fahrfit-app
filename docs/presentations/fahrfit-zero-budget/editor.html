@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      .slide-container { 
+        width: 1280px; 
+        min-height: 720px; 
+        background: #f7f6f2; 
+        color: #222; 
+        font-family: Arial, sans-serif; 
+        padding-top: 62px;
+        position: relative;
+      }
+      .header { padding-left: 78px; padding-right: 78px; }
+      .eyebrow { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #6d68d8; font-weight: 700; }
+      .title { font-size: 42px; letter-spacing: -1.5px; margin-top: 18px; margin-bottom: 12px; }
+      .sub { font-size: 18px; color: #706e78; max-width: 800px; line-height: 1.4; }
+      
+      .editor-layout { 
+        display: grid; 
+        grid-template-columns: 24% 42% 34%; 
+        gap: 24px; 
+        margin-top: 60px; 
+        padding-left: 78px; 
+        padding-right: 78px; 
+      }
+      
+      .col { border-top: 3px solid #d5d3e8; padding-top: 24px; }
+      .col.highlight { border-top-color: #6d68d8; }
+      .col.final { border-top-color: #f2bd62; }
+      
+      .col-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #6d68d8; margin-bottom: 24px; }
+      
+      .feature { display: flex; align-items: flex-start; margin-bottom: 22px; gap: 16px; }
+      .icon { width: 36px; height: 36px; background: #24205b; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+      .text h4 { font-size: 17px; font-weight: 700; color: #24205b; margin-bottom: 4px; }
+      .text p { font-size: 13px; color: #666; line-height: 1.4; }
+      
+      .preview-box { margin-top: 20px; background: #fff; border: 1px solid #d9d7df; height: 140px; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+      
+      .footer { 
+        position: absolute; 
+        bottom: 44px; 
+        left: 78px; 
+        right: 78px; 
+        border-top: 1px solid #d9d7df; 
+        padding-top: 12px; 
+        font-size: 12px; 
+        color: #8d8994; 
+        display: flex; 
+        justify-content: space-between; 
+      }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="eyebrow">06 · Redaktions-Tool</div>
+            <h1 class="title">Der Admin-Frageneditor verbindet Inhalt und Medium.</h1>
+            <p class="sub">Eine klare Struktur trennt Metadaten, Medieninhalte und rechtliche Absicherung für einen effizienten Workflow.</p>
+        </div>
+
+        <div class="editor-layout">
+            <div class="col">
+                <div class="col-title">1. Metadaten</div>
+                <div class="feature">
+                    <div class="icon"><i class="fas fa-tag"></i></div>
+                    <div class="text">
+                        <h4>Klassifizierung</h4>
+                        <p>Thema, Schwierigkeit und Fragentyp festlegen.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="icon"><i class="fas fa-list-ol"></i></div>
+                    <div class="text">
+                        <h4>Katalog-Version</h4>
+                        <p>Zuordnung zum amtlichen Stand (z.B. April 2025).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col highlight">
+                <div class="col-title">2. Inhalt & Medien</div>
+                <div class="feature">
+                    <div class="icon"><i class="fas fa-align-left"></i></div>
+                    <div class="text">
+                        <h4>Fragetext</h4>
+                        <p>Präzise Formulierung der Verkehrssituation.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <div class="text">
+                        <h4>Media-Upload</h4>
+                        <p>Direkt-Upload mit automatischer Kompression.</p>
+                    </div>
+                </div>
+                <div class="preview-box">Vorschau: Bild / Video</div>
+            </div>
+
+            <div class="col final">
+                <div class="col-title">3. Logik & Rechte</div>
+                <div class="feature">
+                    <div class="icon"><i class="fas fa-check-square"></i></div>
+                    <div class="text">
+                        <h4>Antwort-Optionen</h4>
+                        <p>Mehrfachauswahl und Fehlerpunkte definieren.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="text">
+                        <h4>Rechte-Gate</h4>
+                        <p>Lizenznachweis als Pflichtfeld vor Veröffentlichung.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span>FahrFit · Admin-Frageneditor Struktur</span>
+            <span>06</span>
+        </div>
+    </div>
+</body>
+</html>

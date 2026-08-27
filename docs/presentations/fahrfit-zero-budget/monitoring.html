@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      .slide-container { 
+        width: 1280px; 
+        min-height: 720px; 
+        background: #f7f6f2; 
+        color: #222; 
+        font-family: Arial, sans-serif; 
+        padding-top: 62px;
+        position: relative;
+      }
+      .header { padding-left: 78px; padding-right: 78px; }
+      .eyebrow { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #6d68d8; font-weight: 700; }
+      .title { font-size: 42px; letter-spacing: -1.5px; margin-top: 18px; margin-bottom: 12px; }
+      .sub { font-size: 18px; color: #706e78; max-width: 800px; line-height: 1.4; }
+      
+      .content-grid { 
+        display: grid; 
+        grid-template-columns: 45% 55%; 
+        gap: 60px; 
+        padding-left: 78px; 
+        padding-right: 78px; 
+        margin-top: 60px; 
+      }
+      
+      .tracker-panel { border-top: 4px solid #6d68d8; padding-top: 30px; }
+      .tracker-item { margin-bottom: 40px; }
+      .tracker-label { font-size: 14px; font-weight: 700; color: #24205b; margin-bottom: 15px; display: flex; justify-content: space-between; }
+      .progress-bar { width: 100%; height: 12px; background: #d5d3e8; position: relative; }
+      .progress-fill { height: 100%; background: #6d68d8; position: absolute; left: 0; top: 0; }
+      .progress-fill.warning { background: #f2bd62; }
+      
+      .action-panel { border-top: 4px solid #f2bd62; padding-top: 30px; }
+      .action-item { display: flex; align-items: flex-start; margin-bottom: 30px; gap: 20px; }
+      .action-icon { width: 44px; height: 44px; background: #24205b; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+      .action-text h4 { font-size: 18px; font-weight: 700; color: #24205b; margin-bottom: 5px; }
+      .action-text p { font-size: 14px; color: #666; line-height: 1.5; }
+      
+      .footer { 
+        position: absolute; 
+        bottom: 44px; 
+        left: 78px; 
+        right: 78px; 
+        border-top: 1px solid #d9d7df; 
+        padding-top: 12px; 
+        font-size: 12px; 
+        color: #8d8994; 
+        display: flex; 
+        justify-content: space-between; 
+      }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="eyebrow">04 · Monitoring</div>
+            <h1 class="title">Quotenmonitoring verhindert Überraschungen.</h1>
+            <p class="sub">Ein automatisierter Heartbeat-Job überwacht Speicherstand und Operationen, um den Free-Tier-Status jederzeit abzusichern.</p>
+        </div>
+
+        <div class="content-grid">
+            <div class="tracker-panel">
+                <div class="tracker-item">
+                    <div class="tracker-label"><span>Speicher-Tracker (R2)</span><span>8.2 GB / 10 GB</span></div>
+                    <div class="progress-bar"><div class="progress-fill warning" style="width: 82%;"></div></div>
+                </div>
+                <div class="tracker-item">
+                    <div class="tracker-label"><span>Class-A-Operationen</span><span>0.4 Mio / 1 Mio</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 40%;"></div></div>
+                </div>
+                <div class="tracker-item">
+                    <div class="tracker-label"><span>Class-B-Operationen</span><span>2.1 Mio / 10 Mio</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 21%;"></div></div>
+                </div>
+            </div>
+
+            <div class="action-panel">
+                <div class="action-item">
+                    <div class="action-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="action-text">
+                        <h4>Warnstufe (80%)</h4>
+                        <p>Automatisierte Benachrichtigung im Admin-Dashboard und per E-Mail bei Erreichen der 8-GB-Grenze.</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <div class="action-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    <div class="action-text">
+                        <h4>Drosselung</h4>
+                        <p>Reduzierung der erlaubten Upload-Frequenz bei ungewöhnlich hoher Last zum Schutz der Operations-Quoten.</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <div class="action-icon"><i class="fas fa-stop-circle"></i></div>
+                    <div class="action-text">
+                        <h4>Notfall-Stopp (95%)</h4>
+                        <p>Automatische Sperrung der Upload-Funktion bei 9,5 GB, um unvorhergesehene Kosten sicher zu vermeiden.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span>FahrFit · Quoten-Management</span>
+            <span>04</span>
+        </div>
+    </div>
+</body>
+</html>

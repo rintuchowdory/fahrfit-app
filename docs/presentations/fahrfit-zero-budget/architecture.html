@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      .slide-container { 
+        width: 1280px; 
+        min-height: 720px; 
+        background: #f7f6f2; 
+        color: #222; 
+        font-family: Arial, sans-serif; 
+        padding-top: 62px;
+        position: relative;
+      }
+      .header { padding-left: 78px; padding-right: 78px; }
+      .eyebrow { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #6d68d8; font-weight: 700; }
+      .title { font-size: 42px; letter-spacing: -1.5px; margin-top: 18px; margin-bottom: 12px; }
+      .sub { font-size: 18px; color: #706e78; max-width: 840px; line-height: 1.4; }
+      
+      .arch-grid { 
+        display: grid; 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 40px; 
+        padding-left: 78px; 
+        padding-right: 78px; 
+        margin-top: 80px; 
+      }
+      
+      .column { border-top: 4px solid #6d68d8; padding-top: 30px; }
+      .column.highlight { border-top-color: #f2bd62; }
+      
+      .comp-icon { font-size: 32px; color: #24205b; margin-bottom: 24px; }
+      .comp-title { font-size: 22px; font-weight: 700; color: #24205b; margin-bottom: 15px; }
+      
+      .data-box { background: #fff; border: 1px solid #d5d3e8; padding: 20px; margin-bottom: 20px; }
+      .data-item { font-size: 14px; color: #555; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+      .data-item i { font-size: 12px; color: #6d68d8; }
+      
+      .flow-arrow { position: absolute; top: 50%; right: -25px; transform: translateY(-50%); color: #d5d3e8; font-size: 20px; }
+      .col-inner { position: relative; }
+      
+      .user-delivery { 
+        margin-top: 60px; 
+        margin-left: 78px; 
+        margin-right: 78px; 
+        background: #24205b; 
+        color: #fff; 
+        padding: 25px 40px; 
+        display: flex; 
+        align-items: center; 
+        gap: 30px; 
+      }
+      .delivery-icon { font-size: 24px; color: #f2bd62; }
+      .delivery-text { font-size: 16px; line-height: 1.5; color: #aaa8ce; }
+      .delivery-text strong { color: #fff; }
+      
+      .footer { 
+        position: absolute; 
+        bottom: 44px; 
+        left: 78px; 
+        right: 78px; 
+        border-top: 1px solid #d9d7df; 
+        padding-top: 12px; 
+        font-size: 12px; 
+        color: #8d8994; 
+        display: flex; 
+        justify-content: space-between; 
+      }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="eyebrow">05 · System-Architektur</div>
+            <h1 class="title">Storage, CDN und Frage bleiben getrennt.</h1>
+            <p class="sub">Eine saubere Entkopplung von Metadaten und Binärdaten ermöglicht maximale Sicherheit bei minimalen Kosten.</p>
+        </div>
+
+        <div class="arch-grid">
+            <div class="col-inner">
+                <div class="column">
+                    <div class="comp-icon"><i class="fas fa-database"></i></div>
+                    <h3 class="comp-title">Datenbank (TiDB)</h3>
+                    <div class="data-box">
+                        <div class="data-item"><i class="fas fa-check"></i> Fragetexte & Antworten</div>
+                        <div class="data-item"><i class="fas fa-check"></i> Storage-Keys (Referenz)</div>
+                        <div class="data-item"><i class="fas fa-check"></i> Rechte-Metadaten</div>
+                    </div>
+                </div>
+                <div class="flow-arrow"><i class="fas fa-long-arrow-alt-right"></i></div>
+            </div>
+
+            <div class="col-inner">
+                <div class="column highlight">
+                    <div class="comp-icon"><i class="fas fa-cloud"></i></div>
+                    <h3 class="comp-title">Storage (S3/R2)</h3>
+                    <div class="data-box">
+                        <div class="data-item"><i class="fas fa-check"></i> Original-Bilder (WebP)</div>
+                        <div class="data-item"><i class="fas fa-check"></i> Video-Dateien (H.264)</div>
+                        <div class="data-item"><i class="fas fa-check"></i> Poster-Bilder</div>
+                    </div>
+                </div>
+                <div class="flow-arrow"><i class="fas fa-long-arrow-alt-right"></i></div>
+            </div>
+
+            <div class="column">
+                <div class="comp-icon"><i class="fas fa-bolt"></i></div>
+                <h3 class="comp-title">CDN (Cloudflare)</h3>
+                <div class="data-box">
+                    <div class="data-item"><i class="fas fa-check"></i> Edge-Caching</div>
+                    <div class="data-item"><i class="fas fa-check"></i> Signierte Playback-URLs</div>
+                    <div class="data-item"><i class="fas fa-check"></i> Range-Requests</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="user-delivery">
+            <div class="delivery-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="delivery-text">
+                <strong>Sicherheits-Prinzip:</strong> Lernende erhalten niemals direkten Zugriff auf den Storage. Die App liefert nur <strong>kurzlebige Playback-URLs</strong> aus, die nach der Session verfallen.
+            </div>
+        </div>
+
+        <div class="footer">
+            <span>FahrFit · Zero-Budget-Architektur</span>
+            <span>05</span>
+        </div>
+    </div>
+</body>
+</html>

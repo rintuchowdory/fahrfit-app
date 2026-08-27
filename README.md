@@ -73,3 +73,11 @@ Alternativ kann der vollständige Quellcode über den Projekt-Export im Manageme
 ## Nächste Ausbaustufen
 
 Als nächste technische Schritte sollten die Admin-CRUD-Formulare mit den tRPC-Procedures verbunden, der Fragenimport für lizenzierte Inhalte ergänzt, die Prüfungsergebnisse dauerhaft gespeichert und zusätzliche Vitest-Tests für Antwortauswertung, Fehlerstatus und Rollenprüfung hinzugefügt werden.
+
+## Dokumentation
+
+- Zero-Budget-Architektur: `docs/zero-budget-architektur.md`
+- R2-Schutzmaßnahmen: `docs/r2-schutzmassnahmen.md`
+- Medienfragen-Spezifikation: `docs/medienfragen-spezifikation.md`
+- Lizenzkosten-Recherche: `docs/lizenzkosten-recherche.md`
+- Präsentationsprojekt: `docs/presentations/fahrfit-zero-budget/`

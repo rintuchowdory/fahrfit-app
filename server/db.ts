@@ -157,10 +157,10 @@ export async function createTopic(name: string, description?: string) {
   return result[0]?.id ?? null;
 }
 
-export async function createQuestion(input: { topicId: number; prompt: string; explanation: string; options: Array<{ label: string; text: string; isCorrect: boolean }>; mediaUrl?: string; mediaAlt?: string; difficulty?: "easy" | "medium" | "hard" }) {
+export async function createQuestion(input: { topicId: number; prompt: string; explanation: string; options: Array<{ label: string; text: string; isCorrect: boolean }>; mediaUrl?: string; storageKey?: string; mediaType?: "image" | "video"; thumbnailUrl?: string; duration?: number; mediaAlt?: string; rightsStatus: "owned" | "licensed" | "pending"; licenseSource?: string; difficulty?: "easy" | "medium" | "hard" }) {
   const db = await getDb();
   if (!db) return null;
-  const inserted = await db.insert(questions).values({ topicId: input.topicId, prompt: input.prompt, explanation: input.explanation, mediaUrl: input.mediaUrl, mediaAlt: input.mediaAlt, difficulty: input.difficulty ?? "medium", status: "draft" }).$returningId();
+  const inserted = await db.insert(questions).values({ topicId: input.topicId, prompt: input.prompt, explanation: input.explanation, mediaUrl: input.mediaUrl, storageKey: input.storageKey, mediaType: input.mediaType ?? "image", thumbnailUrl: input.thumbnailUrl, duration: input.duration, mediaAlt: input.mediaAlt, rightsStatus: input.rightsStatus, licenseSource: input.licenseSource, difficulty: input.difficulty ?? "medium", status: "draft" }).$returningId();
   const questionId = inserted[0]?.id;
   if (!questionId) return null;
   await db.insert(answerOptions).values(input.options.map((option, index) => ({ questionId, label: option.label, text: option.text, isCorrect: option.isCorrect ? 1 : 0, sortOrder: index })));
