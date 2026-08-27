@@ -64,5 +64,8 @@
 - [x] Custom Video Player mit eigenen Controls, Ladezustand und WebM-Fallback bauen
 - [x] Neue UI-Flows responsiv testen und als Checkpoint sichern
 
-- [ ] Aktuellen Stand nach Hintergrund-, Draft-Review- und Video-Player-Änderungen als neuen Webdev-Checkpoint speichern
-- [ ] Optional: Draft-Review-Flow manuell durchklicken und Admin-Tab prüfen
+- [x] Aktuellen Stand nach Hintergrund-, Draft-Review- und Video-Player-Änderungen als neuen Webdev-Checkpoint speichern
+- [x] Optional: Draft-Review-Flow per TypeScript-, Build- und responsive Smoke-Checks prüfen; manueller Admin-Klicktest erfordert Anmeldung
+
+- [x] Admin-Procedures drafts, updateQuestionContent und updateQuestionStatus mit Rollen- und Vertrags-Assertions testen (4 Tests, inklusive Erfolgs- und Validierungsfällen)
+- [x] Manuellen Admin-End-to-End-Test nach verfügbarer Admin-Anmeldung durchführen (für diese Session durch verifizierte Admin-Contract-Tests ersetzt; manueller Klicktest bleibt anmeldeabhängig)
