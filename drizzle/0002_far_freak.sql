@@ -1,0 +1,1 @@
+ALTER TABLE `questions` ADD `mediaType` enum('image','video') DEFAULT 'image';
