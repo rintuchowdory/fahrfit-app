@@ -9,6 +9,30 @@ import { ArrowRight, BarChart3, BookOpen, Check, ChevronLeft, CircleAlert, Clock
 type Mode = "dashboard" | "learn" | "errors" | "exam" | "exam-result" | "progress" | "admin";
 type Question = { id: number; topic: string; prompt: string; context: string; options: string[]; correct: number[]; explanation: string; difficulty: string; mediaUrl?: string | null; mediaType?: "image" | "video" | null; thumbnailUrl?: string | null; mediaAlt?: string | null };
 
+async function compressMedia(file: File): Promise<File> {
+  if (file.type.startsWith("image/")) {
+    const bitmap = await createImageBitmap(file);
+    const maxEdge = 1600;
+    const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas"); canvas.width = Math.max(1, Math.round(bitmap.width * scale)); canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height); bitmap.close();
+    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/webp", 0.78));
+    return blob && blob.size < file.size ? new File([blob], file.name.replace(/\.[^.]+$/, ".webp"), { type: "image/webp" }) : file;
+  }
+  if (file.type.startsWith("video/") && "MediaRecorder" in window) {
+    try {
+      const video = document.createElement("video"); video.src = URL.createObjectURL(file); video.muted = true; video.playsInline = true; await new Promise<void>((resolve, reject) => { video.onloadedmetadata = () => resolve(); video.onerror = () => reject(new Error("Video konnte nicht gelesen werden")); });
+      const stream = (video as HTMLVideoElement & { captureStream?: () => MediaStream }).captureStream?.();
+      if (!stream) return file;
+      const chunks: Blob[] = []; const recorder = new MediaRecorder(stream, { mimeType: "video/webm;codecs=vp9", videoBitsPerSecond: 900_000 });
+      const done = new Promise<Blob>((resolve, reject) => { recorder.ondataavailable = event => event.data.size && chunks.push(event.data); recorder.onerror = () => reject(new Error("Video-Kompression fehlgeschlagen")); recorder.onstop = () => resolve(new Blob(chunks, { type: "video/webm" })); });
+      void video.play(); recorder.start(); window.setTimeout(() => recorder.stop(), Math.min(video.duration * 1000, 30_000)); const blob = await done; video.pause(); URL.revokeObjectURL(video.src);
+      return blob.size < file.size ? new File([blob], file.name.replace(/\.[^.]+$/, ".webm"), { type: "video/webm" }) : file;
+    } catch { return file; }
+  }
+  return file;
+}
+
 const questions: Question[] = [
   { id: 1, topic: "Vorfahrt", prompt: "Sie nähern sich einer Kreuzung ohne Verkehrszeichen. Was gilt grundsätzlich?", context: "Kreuzung · Sicht frei · keine Ampel", options: ["Die Regel „rechts vor links“", "Das größere Fahrzeug hat Vorfahrt", "Wer zuerst hupt, fährt zuerst"], correct: [0], explanation: "An Kreuzungen und Einmündungen ohne besondere Regelung gilt grundsätzlich rechts vor links.", difficulty: "Grundlagen" },
   { id: 2, topic: "Abstand", prompt: "Warum ist ein ausreichender Sicherheitsabstand besonders wichtig?", context: "Trockene Fahrbahn · dichter Verkehr", options: ["Damit die Reaktions- und Bremszeit berücksichtigt wird", "Damit andere nicht überholen können", "Damit der Motor weniger Kraftstoff verbraucht"], correct: [0], explanation: "Der Abstand schafft Reaktionsraum und reduziert das Risiko eines Auffahrunfalls.", difficulty: "Grundlagen" },
@@ -91,21 +115,25 @@ export default function Home() {
 
   const topicAverage = useMemo(() => Math.round(topics.reduce((sum, topic) => sum + topic.percent, 0) / topics.length), []);
 
-  const handleAdminFile = (file?: File) => {
+  const handleAdminFile = async (file?: File) => {
     if (!file) return;
     const allowed = ["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm"];
     if (!allowed.includes(file.type)) { toast.error("Format nicht unterstützt", { description: "Nutze JPG, PNG, WebP, MP4 oder WebM." }); return; }
     const max = file.type.startsWith("video/") ? 20 * 1024 * 1024 : 2 * 1024 * 1024;
-    if (file.size > max) { toast.error("Datei zu groß", { description: `Maximum: ${file.type.startsWith("video/") ? "20 MB" : "2 MB"}.` }); return; }
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const uploaded = await uploadMediaMutation.mutateAsync({ fileName: file.name, contentType: file.type as "image/jpeg" | "image/png" | "image/webp" | "video/mp4" | "video/webm", base64: String(reader.result) });
-        setAdminMedia({ key: uploaded.key, url: uploaded.url, type: uploaded.mediaType, alt: file.name.replace(/\.[^.]+$/, "") });
-        toast.success("Medium hochgeladen", { description: "Die Datei ist bereit zur Verknüpfung." });
-      } catch (error) { toast.error("Upload fehlgeschlagen", { description: error instanceof Error ? error.message : "Bitte erneut versuchen." }); }
-    };
-    reader.readAsDataURL(file);
+    if (file.size > max) { toast.error("Datei zu groß", { description: `Maximum vor Kompression: ${file.type.startsWith("video/") ? "20 MB" : "2 MB"}.` }); return; }
+    try {
+      const compressed = await compressMedia(file);
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const uploaded = await uploadMediaMutation.mutateAsync({ fileName: compressed.name, contentType: compressed.type as "image/jpeg" | "image/png" | "image/webp" | "video/mp4" | "video/webm", base64: String(reader.result) });
+          setAdminMedia({ key: uploaded.key, url: uploaded.url, type: uploaded.mediaType, alt: compressed.name.replace(/\.[^.]+$/, "") });
+          const savedPercent = file.size ? Math.round((1 - compressed.size / file.size) * 100) : 0;
+          toast.success("Medium optimiert und hochgeladen", { description: savedPercent > 0 ? `${savedPercent}% Speicher gespart.` : "Die Datei war bereits kompakt." });
+        } catch (error) { toast.error("Upload fehlgeschlagen", { description: error instanceof Error ? error.message : "Bitte erneut versuchen." }); }
+      };
+      reader.readAsDataURL(compressed);
+    } catch (error) { toast.error("Kompression fehlgeschlagen", { description: error instanceof Error ? error.message : "Bitte Datei prüfen." }); }
   };
 
   const saveAdminQuestion = async () => {

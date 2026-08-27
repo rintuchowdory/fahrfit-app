@@ -33,6 +33,7 @@ export const questions = mysqlTable("questions", {
   mediaAlt: varchar("mediaAlt", { length: 255 }),
   rightsStatus: mysqlEnum("rightsStatus", ["owned", "licensed", "pending"]).default("pending").notNull(),
   licenseSource: varchar("licenseSource", { length: 255 }),
+  sourceId: varchar("sourceId", { length: 128 }),
   difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).default("medium").notNull(),
   status: mysqlEnum("status", ["draft", "published"]).default("published").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

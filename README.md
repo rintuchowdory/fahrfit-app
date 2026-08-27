@@ -81,3 +81,9 @@ Als nächste technische Schritte sollten die Admin-CRUD-Formulare mit den tRPC-P
 - Medienfragen-Spezifikation: `docs/medienfragen-spezifikation.md`
 - Lizenzkosten-Recherche: `docs/lizenzkosten-recherche.md`
 - Präsentationsprojekt: `docs/presentations/fahrfit-zero-budget/`
+
+## Medienkompression und Katalogimport
+
+Der Admineditor optimiert Bilder vor dem Upload als WebP und versucht Videos im Browser über `MediaRecorder` als WebM mit reduzierter Bitrate zu speichern. Unterstützt werden harte Grenzen von 2 MB für Bilder und 20 MB für Videos.
+
+Ein lizenzierter Klasse-B-Export kann mit `pnpm import:class-b -- ./licensed-class-b.json` importiert werden. Die Datei muss `metadata.licenseStatus: "licensed"`, eine `licenseSource`, Themen mit `sourceId` und Fragen mit eindeutiger `sourceId` enthalten. Der Import ist wiederholbar, ersetzt bestehende Antwortoptionen und legt Fragen zunächst als Entwurf an. Es werden keine offiziellen Inhalte automatisch aus dem Internet geladen.

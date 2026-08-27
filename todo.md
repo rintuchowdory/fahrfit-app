@@ -51,3 +51,9 @@
 - [x] Zero-Budget-Architekturdokumente in das Repository übernehmen
 - [x] Zero-Budget-Präsentationsprojekt in das Repository übernehmen
 - [x] Admineditor testen, Build prüfen, Checkpoint erstellen und nach GitHub pushen
+
+- [x] Bilder vor dem Upload automatisch komprimieren und in WebP umwandeln
+- [x] Videos vor dem Upload automatisch optimieren und Größenlimit durchsetzen
+- [x] Importer für einen vom Rechteinhaber gelieferten lizenzierten Klasse-B-Export erstellen
+- [x] Importvalidierung sowie Importformat und Lizenz-Metadaten testen; DB-Upsert bleibt für einen echten Lizenzexport ausstehend
+- [x] Kompressions- und Importdokumentation im README ergänzen
